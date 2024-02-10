@@ -3,15 +3,18 @@
 :root {
     /* Colors (palette)*/
     --col-purewhite:     white;
-    --col-white:         #f5f3ff;
-    --col-black:         #474545;
-    --col-accent-dark:   #7c3aed;
-    --col-accent-medium: #a78bfa;
-    --col-accent-light:  #ddd6fe;
+    --col-white:         #E8E9EB;
+    --col-grey:          #E0DFD5;
+    --col-black:         #313638;
+    --col-accent-dark:   #EF6461;
+    --col-accent-light: #E4B363;
 
     /* Colors (background)*/
-    --bg-col:                   var(--col-purewhite);
-    
+    --bg-col:               var(--col-purewhite);
+    --hdr-bg-color:         var(--col-grey);
+    --book-itm-bg-color:    var(--col-accent-light);
+    --book-itm-bg-color-hover: var(--col-black);
+
     /* Colors (text/icons)*/
     --col-txt:                  var(--col-black);
     --col-txt-alt:              var(--col-white);
@@ -20,29 +23,41 @@
     /* Colors (icons)*/
 
     /* Font family */
-    --main-font: 'Montserrat', sans-serif;
+    --main-font: 'Lato', sans-serif;
+    --hdr-font: 'Montserrat', sans-serif;
 
     /* Font sizes */
     --txt-fontsize:     18px;
     --txt-lineheight:   1.2;
+
+    --hdr-fontsize:     1.4rem;
 
     /* Text clamping: number of lines */
     /* --main-itm-project-description-max-lines: 6;
     --main-itm-announcements-description-max-lines: 3; */
 
     /* Maximum width (including dashboard margin) */
-    /* --max-width: min(1440px, 100%); */
+    --max-width: min(1440px, 100%);
 
     /*Margins, gaps and paddings (+widths)*/
+    --hdr-padding:     15px;
+    --main-padding: 25px;
+
+    --books-container-gap: 20px;
+
+    --book-box-max-width: 200px;
+    --book-box-min-height: 300px;
+    --book-box-padding: 10px;
 
     /* Images / icons size */
 
 
     /* Radius */
-    /* --radius:           10px; */
+    --radius:           10px;
 
     /* Shadows */
-    /* --outset-shadow: 2px 2px 8px var(--col-accent-medium);
+    --outset-shadow: 2px 2px 5px var(--col-white);
+    /* 
     --outset-shadow-btn-active: 2px 2px 5px var(--col-accent-medium);
     --inset-shadow: 2px 2px 2px var(--col-accent-light) inset; */
 
@@ -85,6 +100,71 @@ body{
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+header,
+main{
+    width: 100%;
+}
+
+.header-container,
+.main-container{
+    width: 100%;
+    max-width: var(--max-width);
+    margin: 0 auto;
+}
+
+/* || Header */
+
+header{
+    background-color: var(--hdr-bg-color);
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: var(--outset-shadow);
+}
+
+.header-container{
+    font-family: var(--hdr-font);
+    font-size: var(--hdr-fontsize);
+    padding: var(--hdr-padding);
+}
+
+h1 .highlight{
+    color: var(--col-accent-dark);
+}
+
+/* || Main */
+
+main{
+    flex: 1;
+}
+
+.main-container{
+    padding: var(--main-padding);
+}
+
+/* || Books container */
+.books-container{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(var(--book-box-max-width),100%),1fr));
+    gap: var(--books-container-gap);
+    justify-content: stretch;
+}
+
+
+/* || Book box */
+
+.book-box{
+    background-color: var(--book-itm-bg-color);
+    padding: var(--book-box-padding);
+    min-height: var(--book-box-min-height);
+    height: var(--book-box-min-height);
+    border-radius: var(--radius);
+    box-shadow: var(--outset-shadow);
+}
+
+.book-box:hover{
+    background-color: var(--book-itm-bg-color-hover);
+    color: var(--col-txt-alt);
 }
 
 
