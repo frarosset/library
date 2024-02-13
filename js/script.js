@@ -1,7 +1,7 @@
 let currentId = 0; // Global variable
 let InitialNumOfBooks = 10;
 
-let statesOfRead = ['not read yet', 'just started', 'about half read', 'almost finished','read'];
+let statesOfRead = ['not read yet', 'just started', 'halfway through', 'almost finished','read'];
 
 /* Generic function --------------------------------------- */
 function randomInt(min, max) {
@@ -28,7 +28,7 @@ Book.prototype.stateFormatted = function () {
 };
 
 Book.prototype.addedOnFormatted = function () {
-    return this.addedOn.toLocaleString();
+    return this.addedOn.toLocaleDateString();
 };
 
 Book.prototype.info = function () {
