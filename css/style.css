@@ -56,8 +56,8 @@
 
     --hdr-fontsize:             1.4rem;
     --hdr-btn-fontsize:         0.8rem;
-    --book-title-fontsize:      1.4rem;
-    --book-author-fontsize:     1.2rem;
+    --book-title-fontsize:      1.3rem;
+    --book-author-fontsize:     1.1rem;
     --book-data-fontsize:       1.8rem;
     --book-data-lbl-fontsize:   1rem;
     --book-pages-read-fontsize: 0.7em;
@@ -74,7 +74,7 @@
     --max-width: min(1440px, 100%);
 
     /*Margins, gaps and paddings (+widths)*/
-    --hdr-padding:  15px 25px;
+    --hdr-padding:  10px 25px;
 
     --hdr-btn-height: 4em;
     --hdr-btn-width: 4em;
@@ -110,11 +110,8 @@
     --radius:           10px;
 
     /* Shadows */
-    --outset-shadow: 2px 2px 5px var(--col-grey);
-    --outset-shadow-dark: 2px 2px 5px var(--col-black);
-    /* 
-    --outset-shadow-btn-active: 2px 2px 5px var(--col-accent-medium);
-    --inset-shadow: 2px 2px 2px var(--col-accent-light) inset; */
+    --outset-shadow: 2px 2px 3px var(--col-grey);
+    --outset-shadow-dark: 1px 1px 5px var(--col-black);
 
     /* Animations on hover / active / ...*/
     --transition-time: 0.8s;
@@ -142,7 +139,8 @@ html {
 
 body {
     margin: 0 auto;
-    height: 100vh;
+    min-height: 100vh;
+    height: 100%;
     /*it is assumed the same for <html>*/
     width: 100%;
     /* or max-width -- this avoids horizontal scroll bars */
@@ -174,7 +172,9 @@ main{
 
 header{
     background-color: var(--hdr-bg-col);
-    box-shadow: var(--outset-shadow);
+    box-shadow: var(--outset-shadow-dark);
+    position: sticky;
+    top: 0;
 }
 
 .header-container{

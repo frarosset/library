@@ -10,6 +10,13 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function removeDescendants(elem){
+    while (elem.hasChildNodes()) {
+        removeDescendants(elem.lastChild)
+        elem.removeChild(elem.lastChild);
+    }
+}
+
 /* Book Constructor --------------------------------------- */
 
 function Book(state, title, author, pages, genre='-', year='-', pagesRead = 0) {
@@ -67,24 +74,6 @@ Library.prototype.addBook = function (book) {
     // Update the library array
     this.books.push(book);
 }
-
-/* Get template data --------------------------------------- */
-
-function initLibrary(library,numOfBooks){ // library is an object, passed by reference
-    let booksContainer = document.querySelector(".books-container");
-
-    for (let i=0; i<numOfBooks; i++){
-        let bookData = sampleBooks[i];
-        let state =  randomInt(0,statesOfRead.length-1);
-        let book = new Book(state,...bookData);
-        library.addBook(book);
-
-        /* Add it to the DOM */
-        let bookBox = createNewBookBox(book);
-        booksContainer.appendChild(bookBox);
-    }
-}
-
 
 /* Book Box (DOM)*/
 
@@ -335,6 +324,43 @@ function createStatusSvg(){
 
 /* bookBox -> .favourite is optional */
 
+/* Buttons callbacks */
+function newBook_callback(e){
+
+}
+
+function clearall_callback(e){
+      
+
+
+    /* Delete all the childred and the descendants of book-container*/
+    let booksContainer = document.querySelector(".books-container");
+    removeDescendants(booksContainer);
+
+    /* Delete the myLibrary object */
+    /* remove all references to the object, which will be garbage collected later on*/
+    myLibrary = undefined;
+}
+
+/* Get template data --------------------------------------- */
+
+function initLibrary(library,numOfBooks){ // library is an object, passed by reference
+    let booksContainer = document.querySelector(".books-container");
+
+    for (let i=0; i<numOfBooks; i++){
+        let bookData = sampleBooks[i];
+        let state =  randomInt(0,statesOfRead.length-1);
+        let book = new Book(state,...bookData);
+        library.addBook(book);
+
+        /* Add it to the DOM */
+        let bookBox = createNewBookBox(book);
+        booksContainer.appendChild(bookBox);
+    }
+
+    let clearAllBtn = document.querySelector(".header-container .clear-all");
+    clearAllBtn.addEventListener('click',clearall_callback);
+}
 
 
 /* Some sample data --------------------------------------- */
