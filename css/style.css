@@ -104,7 +104,7 @@
     --inset-shadow: 2px 2px 2px var(--col-accent-light) inset; */
 
     /* Animations on hover / active / ...*/
-    --transition-time: 2s;
+    --transition-time: 0.8s;
 
 }
 
@@ -269,7 +269,8 @@ main{
 .book-data-section{
     grid-area: data;
     height: 0px;
-    padding: 0;
+    padding-top: 0px;
+    padding-bottom: 0px;
     overflow: hidden;
     background-image: linear-gradient(180deg, var(--book-data-bg-col), var(--col-transparent));
 
@@ -397,6 +398,9 @@ main{
 .book-addedon{
     font-size: var(--book-addedon-fontsize);
     color: var(--book-addedon-lbl-col);
+    visibility: hidden;
+    opacity: 0;
+    transition: all var(--transition-time);
 }
 
 .book-addedon .var-addedon{
@@ -428,6 +432,13 @@ main{
 .book-box:hover .book-status svg circle:nth-child(2){
     stroke: var(--book-highlight-col);;
 }
+
+.book-box:hover .book-addedon{
+    visibility: visible;
+    opacity: 1;
+    transition: all var(--transition-time);
+}
+
 
 button:hover {
     color: var(--book-data-col);
