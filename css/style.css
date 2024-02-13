@@ -17,6 +17,9 @@
     --bg-col:                   var(--col-purewhite);
     --hdr-bg-col:               var(--col-white);
 
+    --hdr-btn-bg-col:           var(--col-accent-dark);
+    --hdr-btn-bg-col-alt:       var(--col-grey);
+
     --book-itm-bg-col:          var(--col-accent-light);
     --book-title-author-bg-col: var(--col-with-alpha);
     --book-title-bg-col-hover:  var(--col-with-alpha-dark); /*var(--col-accent-light)*/
@@ -26,6 +29,9 @@
     --col-txt:                  var(--col-black);
     --col-txt-alt:              var(--col-white);
     --col-highlight:            var(--col-accent-dark);
+
+    --hdr-btn-col:              var(--col-black);
+    --hdr-btn-col-alt:          var(--col-black);
 
     --book-title-col:           var(--col-accent-dark);
     --book-title-col-hover:     var(--col-black);
@@ -49,6 +55,7 @@
     --txt-lineheight:   1.2;
 
     --hdr-fontsize:             1.4rem;
+    --hdr-btn-fontsize:         0.8rem;
     --book-title-fontsize:      1.4rem;
     --book-author-fontsize:     1.2rem;
     --book-data-fontsize:       1.8rem;
@@ -67,7 +74,13 @@
     --max-width: min(1440px, 100%);
 
     /*Margins, gaps and paddings (+widths)*/
-    --hdr-padding:  15px;
+    --hdr-padding:  15px 25px;
+
+    --hdr-btn-height: 4em;
+    --hdr-btn-width: 4em;
+    --hdr-btn-gap: 6px;
+    --hdr-btn-icon-len: 1.8rem;
+
     --main-padding: 25px;
 
     --books-container-gap: 20px;
@@ -168,11 +181,92 @@ header{
     font-family: var(--hdr-font);
     font-size: var(--hdr-fontsize);
     padding: var(--hdr-padding);
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .header-container h1 .highlight{
     color: var(--col-accent-dark);
 }
+
+/* || Header buttons */
+.header-buttons{
+    display: flex;
+    gap: var(--hdr-btn-gap);
+}
+
+.header-container button{
+    height: var(--hdr-btn-height);
+    width: var(--hdr-btn-width);
+    font-size: var(--hdr-btn-fontsize);
+    border: 1px solid var(--hdr-bg-col);
+    outline: none;
+    border-radius: var(--radius);
+    vertical-align: center;
+    display:inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-container .new-book{
+    background-color: var(--hdr-btn-bg-col);
+    color: var(--hdr-btn-col);
+}
+
+.header-container .clear-all{
+    background-color: var(--hdr-btn-bg-col-alt);
+    color: var(--hdr-btn-col-alt);
+}
+ 
+.header-container .button-icon::before{
+    display: inline-block;
+    content:"";
+    width: var(--hdr-btn-icon-len); 
+    height: var(--hdr-btn-icon-len); 
+    background-size: var(--hdr-btn-icon-len) var(--hdr-btn-icon-len);
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+}
+
+.header-container button .new-book-icon::before{
+    background-color: var(--hdr-btn-col);
+}
+.header-container button .clear-all-icon::before{
+    background-color: var(--hdr-btn-col-alt);
+}
+
+.header-container .button-txt{
+    display: none;
+}
+
+.header-container button:hover .button-icon::before{
+    display: none;
+}
+.header-container button:hover .button-txt{
+    display: initial;
+}
+
+.header-container button:hover{
+    font-weight: bold;
+    border-radius: 50%;
+}
+
+.header-container .new-book:hover{
+    border: 16px solid var(--hdr-btn-bg-col);
+}
+
+.header-container .clear-all:hover{
+    border: 1px solid var(--hdr-btn-bg-col-alt);
+}
+
+.header-container button:active{
+    font-weight: bold;
+    border: 1px solid var(--hdr-bg-col) !important;
+    border-radius: 50%;
+}
+
 
 /* || Main */
 
@@ -440,14 +534,27 @@ main{
 }
 
 
-button:hover {
+.book-pages button:hover {
     color: var(--book-data-col);
 }
 
-button:active {
+.book-pages button:active {
     background-color: var(--bg-col);
     color: var(--book-title-col);
 }
+
+/* || Icons sources */
+/* from: https://pictogrammers.com/library/mdi/ */
+
+.header-container .new-book-icon{
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>plus-thick</title><path d="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z" /></svg>');
+}
+
+.header-container .clear-all-icon{
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>delete-sweep-outline</title><path d="M15,16H19V18H15V16M15,8H22V10H15V8M15,12H21V14H15V12M11,10V18H5V10H11M13,8H3V18A2,2 0 0,0 5,20H11A2,2 0 0,0 13,18V8M14,5H11L10,4H6L5,5H2V7H14V5Z" /></svg>');
+}
+
+
 
 /* || Footer */
 footer {
