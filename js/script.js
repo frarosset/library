@@ -325,21 +325,25 @@ function createStatusSvg(){
 /* bookBox -> .favourite is optional */
 
 /* Buttons callbacks */
-function newBook_callback(e){
-
+function showModal_callback(e){
+    e.target.associatedModal.showModal();
 }
 
-function clearall_callback(e){
-      
+function closeModal_callback(e){
+    e.target.associatedModal.close();
+}
 
 
+function clearAll_callback(e){
     /* Delete all the childred and the descendants of book-container*/
-    let booksContainer = document.querySelector(".books-container");
     removeDescendants(booksContainer);
 
     /* Delete the myLibrary object */
     /* remove all references to the object, which will be garbage collected later on*/
     myLibrary = undefined;
+
+    // Close the modal
+    e.target.associatedModal.close();
 }
 
 /* Get template data --------------------------------------- */
@@ -358,8 +362,38 @@ function initLibrary(library,numOfBooks){ // library is an object, passed by ref
         booksContainer.appendChild(bookBox);
     }
 
-    let clearAllBtn = document.querySelector(".header-container .clear-all");
-    clearAllBtn.addEventListener('click',clearall_callback);
+    let newBookBtn = document.querySelector(".header-container button.new-book");
+    let newBookDialog = document.querySelector("#dialog-new-book");
+
+    let newBookCancelBtn = document.querySelector("#dialog-new-book button.cancel");
+    let newBookSuggestBtn = document.querySelector("#dialog-new-book button.suggest");
+    let newBookAddBtn = document.querySelector("#dialog-new-book button.add");
+
+    let clearAllBtn = document.querySelector(".header-container button.clear-all");
+    let clearAllDialog = document.querySelector("#dialog-clear-all");
+
+    let clearAllCancelBtn = document.querySelector("#dialog-clear-all button.cancel");
+    let clearAllYesBtn = document.querySelector("#dialog-clear-all button.yes");
+
+    newBookBtn.associatedModal = newBookDialog;
+    newBookCancelBtn.associatedModal = newBookDialog;
+    newBookSuggestBtn.associatedModal = newBookDialog;
+    newBookAddBtn.associatedModal = newBookDialog;
+
+    clearAllBtn.associatedModal = clearAllDialog;
+    clearAllCancelBtn.associatedModal = clearAllDialog;
+    clearAllYesBtn.associatedModal = clearAllDialog;
+
+    newBookBtn.addEventListener('click',showModal_callback);
+    clearAllBtn.addEventListener('click',showModal_callback);
+
+    newBookCancelBtn.addEventListener('click',closeModal_callback);
+    clearAllCancelBtn.addEventListener('click',closeModal_callback);
+
+    //newBookSuggestBtn.addEventListener('click',newBookSuggest_callback); /* TODO */
+    //newBookAddBtn.addEventListener('click',newBookAdd_callback); /* TODO */  
+    clearAllYesBtn.addEventListener('click',clearAll_callback);
+
 }
 
 
@@ -394,7 +428,7 @@ const sampleBooks = [
 
     ['A study in scarlet', 'A.C. Doyle', 350, 'Detective', 1887],
     ['The Sign of the Four', 'A.C. Doyle', 100, 'Detective', 1890],
-    ['The Hound of the Baskervilles', 'A.C. Doyle', 'Detective', 186, 1901],
+    ['The Hound of the Baskervilles', 'A.C. Doyle', 186, 'Detective', 1901],
     ['The Valley of Fear', 'A.C. Doyle', 240, 'Detective', 1914],
     ['The Adventures of Sherlock Holmes', 'A.C. Doyle', 307, 'Detective', 1891],
     ['The Memoirs of Sherlock Holmes', 'A.C. Doyle', 279, 'Detective', 1892],
@@ -415,6 +449,7 @@ const sampleBooks = [
 
 
 /* Initialization + Testing code */
+let booksContainer = document.querySelector(".books-container");
 
 let myLibrary = new Library();
 initLibrary(myLibrary,InitialNumOfBooks);

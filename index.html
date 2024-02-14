@@ -9,12 +9,35 @@
     <script src='./js/script.js' defer></script>
 </head>
 <body>
+    <dialog id="dialog-new-book">
+        <div class="dialog-content">
+            <p class="dialog-description">Add a new book</p>
+            <form>
+                <input type="text">
+            </form>
+            <div class="dialog-buttons group-buttons">
+                <button class="cancel" value="no">Cancel</button>
+                <button class="suggest" value="suggest">Suggest a book</button>
+                <div class="flex-separator"></div>
+                <button class="add btn-highlight" value="add" autofocus>Add</button>    
+            </div>
+        </div>
+    </dialog>
+    <dialog id="dialog-clear-all">
+        <div class="dialog-content">
+            <p class="dialog-description">Are you sure you want to clear all the books?</p>
+            <div class="dialog-buttons group-buttons">
+                <button class="cancel" value="no">Cancel</button>
+                <button class="yes btn-highlight" value="yes" autofocus>Yes</button>    
+            </div>
+        </div>
+    </dialog>
     <header>
         <div class="header-container">
             <h1><span class="highlight">Libr</span>App</h1>
-            <div class="header-buttons">
-                <button class="new-book" type="button"><div class="button-icon new-book-icon"></div><div class="button-txt new-book-txt">New book</div></button>
-                <button class="clear-all" type="button"><div class="button-icon clear-all-icon"></div><div class="button-txt clear-all-txt">Clear all</div></button>
+            <div class="header-buttons group-buttons">
+                <button class="new-book btn-highlight" type="button"><div class="icon new-book-icon"></div><div class="txt new-book-txt">New book</div></button>
+                <button class="clear-all" type="button"><div class="icon clear-all-icon"></div><div class="txt clear-all-txt">Clear all</div></button>
             </div>
         </div>
     </header>

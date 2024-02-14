@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat&family=Lato&display=swap');
 
-:root {
+:root,
+::backdrop {
     /* Colors (palette)*/
     --col-purewhite:     white;
     --col-white:         #E8E9EB; /* RGB(232, 233, 235) */
@@ -17,8 +18,10 @@
     --bg-col:                   var(--col-purewhite);
     --hdr-bg-col:               var(--col-white);
 
-    --hdr-btn-bg-col:           var(--col-accent-dark);
-    --hdr-btn-bg-col-alt:       var(--col-grey);
+    --btn-bg-col:               var(--col-grey); 
+    --btn-bg-col-alt:           var(--col-accent-dark);
+
+    --dialog-bg-col:            var(--col-purewhite); 
 
     --book-itm-bg-col:          var(--col-accent-light);
     --book-title-author-bg-col: var(--col-with-alpha);
@@ -30,10 +33,14 @@
     --col-txt-alt:              var(--col-white);
     --col-highlight:            var(--col-accent-dark);
 
-    --hdr-btn-col:              var(--col-black);
-    --hdr-btn-col-alt:          var(--col-black);
+    --btn-col:                  var(--col-black);
+    --btn-col-alt:              var(--col-black);
+    --btn-focus-col:            var(--col-grey);
 
-    --book-title-col:           var(--col-accent-dark);
+    --dialog-col:               var(--col-black);
+    --dialog-border-col:        var(--col-accent-dark);
+
+    --book-title-col:           var(--col-black);
     --book-title-col-hover:     var(--col-black);
     --book-author-col:          var(--col-black);
     --book-data-col:            var(--col-accent-light);
@@ -54,6 +61,8 @@
     --txt-fontsize:     14px;
     --txt-lineheight:   1.2;
 
+    --dialog-fontsize:          1.1rem;
+    --dialog-btn-fontsize:      1rem;
     --hdr-fontsize:             1.4rem;
     --hdr-btn-fontsize:         0.8rem;
     --book-title-fontsize:      1.3rem;
@@ -64,7 +73,7 @@
     --book-status-fontsize:     2.1rem;
     --book-addedon-fontsize:    0.8rem;
     --book-addedon-var-fontsize: 0.9rem;
-    --book-page-btn-fontsize: 1em;
+    --book-page-btn-fontsize:   1rem;
 
     /* Text clamping: number of lines */
     /* --main-itm-project-description-max-lines: 6;
@@ -74,37 +83,45 @@
     --max-width: min(1440px, 100%);
 
     /*Margins, gaps and paddings (+widths)*/
-    --hdr-padding:  10px 25px;
+    --btn-focus-offset:     1px;
+    --btn-focus-width:      2px;
 
-    --hdr-btn-height: 4em;
-    --hdr-btn-width: 4em;
-    --hdr-btn-gap: 6px;
-    --hdr-btn-icon-len: 1.8rem;
+    --dialog-padding:       20px;
+    --dialog-border-width:  3px;
+    --dialog-gap:           30px;
+    --dialog-btn-height:    3em;
+    --dialog-btn-width:     5em;
+    --dialog-btn-gap:       10px;
+    --dialog-btn-border-width:2px;
 
-    --main-padding: 25px;
+    --hdr-padding:          10px 25px;
+    --hdr-btn-height:       4em;
+    --hdr-btn-width:        4em;
+    --hdr-btn-gap:          6px;
+    --hdr-btn-icon-len:     1.8rem;
+    --hdr-btn-border-width: 2px;
 
-    --books-container-gap: 20px;
+    --main-padding:         25px;
 
-    --book-box-max-width: 200px;
-    --book-box-height: min-content;
+    --books-container-gap:  20px;
 
-    --book-box-padding: 10px;
-    --book-box-data-gap: 5px 10px;
+    --book-box-max-width:   200px;
+    --book-box-height:      min-content;
 
-    --book-status-height: 60px;
+    --book-box-padding:     10px;
+    --book-box-data-gap:    5px 10px;
+
+    --book-status-height:   60px;
     --book-property-height: calc(calc(var(--book-data-lbl-fontsize) + var(--book-data-fontsize)) * var(--txt-lineheight));
     --book-data-height: calc(calc(2 * var(--book-box-padding)) + calc(1 * var(--book-property-height)) + max(var(--book-property-height),var(--book-status-height))); /* plus gap --------------------------------------------------------*/
 
-    --book-pages-btns-gap: 5px;
+    --book-pages-btns-gap:  5px;
 
     --book-footer-icon-gap: 3px;
     --book-footer-icon-len: 6px;
 
     --book-page-btn-height: 1.2em;
-    --book-page-btn-width: 2em;
-
-    /* Images / icons size */
-
+    --book-page-btn-width:  2em;
 
     /* Radius */
     --radius:           10px;
@@ -115,7 +132,11 @@
 
     /* Animations on hover / active / ...*/
     --transition-time: 0.8s;
+}
 
+::backdrop {
+    background-color: var(--col-black);
+    opacity: 0.75;
 }
 
 
@@ -168,6 +189,75 @@ main{
     margin: 0 auto;
 }
 
+/* Buttons */
+.group-buttons{
+    display: flex;
+    justify-content: space-around;
+    gap: var(--btn-gap);
+}
+
+button{
+    height: var(--btn-height);
+    width: var(--btn-width);
+    font-size: var(--btn-fontsize);
+    border-radius: var(--radius);
+    vertical-align: center;
+    display:inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--btn-bg-col);
+    color: var(--btn-col);
+    border: var(--btn-border-width) solid transparent;
+    background-clip: padding-box; /*to set the border transparent*/
+    outline: none;
+    user-select: none;
+}
+
+button > * {
+    pointer-events: none;
+}
+
+button.btn-highlight{
+    background-color: var(--btn-bg-col-alt);
+    color: var(--btn-col-alt);
+}
+
+button:hover{
+    font-weight: bold;
+    border-color: var(--btn-bg-col);
+}
+
+button.btn-highlight:hover{
+    border-color: var(--btn-bg-col-alt);
+}
+
+button:active,
+button.btn-highlight:active{
+    font-weight: bold;
+    border-color: transparent;
+}
+
+button:focus-visible{
+    outline: var(--btn-focus-width) solid var(--btn-focus-col);
+    outline-offset: var(--btn-focus-offset);
+}
+ 
+button .icon::before{
+    display: inline-block;
+    content:"";
+    width: var(--btn-icon-len); 
+    height: var(--btn-icon-len); 
+    background-size: var(--btn-icon-len) var(--btn-icon-len);
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    background-color: var(--btn-col);
+}
+
+button.btn-highlight .icon::before{
+    background-color: var(--btn-col-alt);
+}
+
 /* || Header */
 
 header{
@@ -175,6 +265,7 @@ header{
     box-shadow: var(--outset-shadow-dark);
     position: sticky;
     top: 0;
+    z-index: 1;
 }
 
 .header-container{
@@ -192,81 +283,28 @@ header{
 
 /* || Header buttons */
 .header-buttons{
-    display: flex;
-    gap: var(--hdr-btn-gap);
+    --btn-height: var(--hdr-btn-height);
+    --btn-width: var(--hdr-btn-width);
+    --btn-gap: var(--hdr-btn-gap);
+    --btn-icon-len: var(--hdr-btn-icon-len);
+    --btn-fontsize: var(--hdr-btn-fontsize);
+    --btn-border-width: var(--hdr-btn-border-width);
 }
 
-.header-container button{
-    height: var(--hdr-btn-height);
-    width: var(--hdr-btn-width);
-    font-size: var(--hdr-btn-fontsize);
-    border: 1px solid var(--hdr-bg-col);
-    outline: none;
-    border-radius: var(--radius);
-    vertical-align: center;
-    display:inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.header-container .new-book{
-    background-color: var(--hdr-btn-bg-col);
-    color: var(--hdr-btn-col);
-}
-
-.header-container .clear-all{
-    background-color: var(--hdr-btn-bg-col-alt);
-    color: var(--hdr-btn-col-alt);
-}
- 
-.header-container .button-icon::before{
-    display: inline-block;
-    content:"";
-    width: var(--hdr-btn-icon-len); 
-    height: var(--hdr-btn-icon-len); 
-    background-size: var(--hdr-btn-icon-len) var(--hdr-btn-icon-len);
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    mask-position: center;
-}
-
-.header-container button .new-book-icon::before{
-    background-color: var(--hdr-btn-col);
-}
-.header-container button .clear-all-icon::before{
-    background-color: var(--hdr-btn-col-alt);
-}
-
-.header-container .button-txt{
+.header-container .txt{
     display: none;
 }
 
-.header-container button:hover .button-icon::before{
+.header-container button:hover .icon::before{
     display: none;
 }
-.header-container button:hover .button-txt{
+.header-container button:hover .txt{
     display: initial;
 }
 
 .header-container button:hover{
-    font-weight: bold;
     border-radius: 50%;
 }
-
-.header-container .new-book:hover{
-    border: 16px solid var(--hdr-btn-bg-col);
-}
-
-.header-container .clear-all:hover{
-    border: 1px solid var(--hdr-btn-bg-col-alt);
-}
-
-.header-container button:active{
-    font-weight: bold;
-    border: 1px solid var(--hdr-bg-col) !important;
-    border-radius: 50%;
-}
-
 
 /* || Main */
 
@@ -542,6 +580,54 @@ main{
     background-color: var(--bg-col);
     color: var(--book-title-col);
 }
+
+
+/* || Dialog boxes */
+
+dialog{
+    border-radius: var(--radius);
+    color: var(--dialog-col);
+    background-color: var(--dialog-bg-col);
+    border: var(--dialog-border-width) solid var(--dialog-border-col); 
+    box-shadow: var(--outset-shadow-dark);
+    font-size: var(--dialog-fontsize);
+                
+    /*center it in the page*/
+    /* top: 50%;
+    transform: translateY(-50%);
+    margin: 0 auto;  */
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.dialog-content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+    gap: var(--dialog-gap);
+    padding: var(--dialog-padding);
+}
+
+.dialog-content>*{
+    width: 100%;
+}
+
+.flex-separator{
+    flex:1;
+}
+
+.dialog-buttons{
+    --btn-height: var(--dialog-btn-height);
+    --btn-width: var(--dialog-btn-width);
+    --btn-gap: var(--dialog-btn-gap);
+    --btn-fontsize: var(--dialog-btn-fontsize);
+    --btn-border-width: var(--dialog-btn-border-width);
+}
+
 
 /* || Icons sources */
 /* from: https://pictogrammers.com/library/mdi/ */
