@@ -11,9 +11,53 @@
 <body>
     <dialog id="dialog-new-book">
         <div class="dialog-content">
-            <p class="dialog-description">Add a new book</p>
-            <form>
-                <input type="text">
+            <p class="dialog-description">Add a new book! <span class="note">Fields with <span class="required-span">∗</span> are requried.</span></p>
+            <form method="dialog" class="dialog-form">
+                <div id="new-book-title-div" class="input-field">
+                    <input id="new-book-title" name="title" type="text" placeholder="The Hobbit" maxlength="120" required>
+                    <label for="new-book-title">Title</label>
+                </div>
+                <div id="new-book-author-div" class="input-field">
+                    <input id="new-book-author" name="author" type="text" maxlength="40" required>
+                    <label for="new-book-author">Author</label>
+                </div>
+                <div id="new-book-genre-div" class="input-field">
+                    <select id="new-book-genre" name="genre">
+                        <option selected>-</option>
+                        <option>Action</option>
+                        <option>Adventure</option>
+                        <option>Detective</option>
+                        <option>Fantasy</option>
+                        <option>Horror</option>
+                        <option>Historical</option>
+                        <option>Mystery</option>
+                        <option>Sci-Fi</option>
+                        <option>Thriller</option>
+                        <option>Western</option>
+                        <option>Other</option>
+                    </select>
+                    <label for="new-book-genre">Genre</label>
+                </div>
+                <div id="new-book-year-div" class="input-field">
+                    <input id="new-book-year" name="year" type="number" min="1450" max="2099" step="1">
+                    <label for="new-book-year">Year</label>
+                </div>
+                <fieldset id="new-book-status-fieldset">
+                    <input type="radio" id="notread" name="state" checked>
+                    <label for="notread">Not read</label>
+                    <input type="radio" id="reading" name="state">
+                    <label for="reading">Reading</label>
+                    <input type="radio" id="read" name="state">
+                    <label for="read">Read</label>
+                </fieldset>
+                <div id="new-book-pages-div" class="input-field">
+                    <input id="new-book-pages" name="pages" type="number" min="1" max="8000" step="1" required>
+                    <label for="new-book-pages">Total pages</label>
+                </div>
+                <div id="new-book-pagesread-div" class="input-field">
+                    <input id="new-book-pagesread" name="pagesread" type="number" min="0" max="8000" step="1" value="0">
+                    <label for="new-book-pagesread">Pages read</label>
+                </div>
             </form>
             <div class="dialog-buttons group-buttons">
                 <button class="cancel" value="no">Cancel</button>

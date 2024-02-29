@@ -39,6 +39,9 @@
 
     --dialog-col:               var(--col-black);
     --dialog-border-col:        var(--col-accent-dark);
+    --dialog-input-border-color: var(--col-grey);
+    --dialog-label-color: var(--col-white);
+    --dialog-label-focus-color: var(--col-grey);
 
     --book-title-col:           var(--col-black);
     --book-title-col-hover:     var(--col-black);
@@ -58,11 +61,14 @@
     --highlight-font: 'Montserrat', sans-serif;
 
     /* Font sizes */
-    --txt-fontsize:     14px;
+    --txt-fontsize:     min(1.6vmax, 16px);
     --txt-lineheight:   1.2;
 
     --dialog-fontsize:          1.1rem;
     --dialog-btn-fontsize:      1rem;
+    --dialog-input-lineheight: 2;
+    --unselected-fontsize: calc(var(--dialog-fontsize) * 0.5);
+
     --hdr-fontsize:             1.4rem;
     --hdr-btn-fontsize:         0.8rem;
     --book-title-fontsize:      1.3rem;
@@ -88,11 +94,13 @@
 
     --dialog-padding:       20px;
     --dialog-border-width:  3px;
-    --dialog-gap:           30px;
+    --dialog-gap:           1.5rem;
     --dialog-btn-height:    3em;
     --dialog-btn-width:     5em;
     --dialog-btn-gap:       10px;
     --dialog-btn-border-width:2px;
+    --dialog-form-gap: calc(var(--dialog-gap) / 2) calc(var(--dialog-gap));
+    --dialog-form-radius: calc(var(--radius) / 2);
 
     --hdr-padding:          10px 25px;
     --hdr-btn-height:       4em;
@@ -165,6 +173,7 @@ body {
     /*it is assumed the same for <html>*/
     width: 100%;
     /* or max-width -- this avoids horizontal scroll bars */
+    touch-action: manipulation; /* disable double tap to zoom on some browsers*/
 }
 
 /*****************************************************/
@@ -201,7 +210,8 @@ button{
     width: var(--btn-width);
     font-size: var(--btn-fontsize);
     border-radius: var(--radius);
-    vertical-align: center;
+    vertical-align: middle;
+    text-wrap: balance;
     display:inline-flex;
     align-items: center;
     justify-content: center;
@@ -370,6 +380,7 @@ main{
     font-variant: small-caps;
     color: var(--book-title-col);
     background-color: var(--book-title-author-bg-col);
+    text-wrap: balance;
 }
 
 .book-author-section{   
@@ -472,7 +483,7 @@ main{
     border: 1px solid var(--book-data-lbl-col);
     outline: none;
     border-radius: var(--radius);
-    vertical-align: center;
+    vertical-align: middle;
     display:inline-flex;
     align-items: center;
     justify-content: center;
@@ -606,14 +617,10 @@ dialog{
 .dialog-content{
     display: flex;
     flex-direction: column;
-    align-items: center;
-    align-content: center;
+    align-items: stretch;
+    justify-content: space-around;
     gap: var(--dialog-gap);
     padding: var(--dialog-padding);
-}
-
-.dialog-content>*{
-    width: 100%;
 }
 
 .flex-separator{
@@ -626,6 +633,168 @@ dialog{
     --btn-gap: var(--dialog-btn-gap);
     --btn-fontsize: var(--dialog-btn-fontsize);
     --btn-border-width: var(--dialog-btn-border-width);
+}
+
+
+/* | Dialog new book */
+dialog#dialog-new-book{
+    max-width: min(calc(var(--max-width) - 2 * var(--main-padding)), 768px);
+    width: 100%;
+}
+
+.dialog-form{
+    font-size: var(--dialog-fontsize);
+    line-height: var(--dialog-input-lineheight);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: 
+    "title title"
+    "author author"
+    "genre genre"
+    "year year"
+    "status status"
+    "pages pagesread";
+    gap: var(--dialog-form-gap);
+}
+
+#new-book-title-div{
+    grid-area: title;
+}
+#new-book-author-div{
+    grid-area: author;
+}
+#new-book-year-div{
+    grid-area: year;
+}
+#new-book-genre-div{
+    grid-area: genre;
+}
+#new-book-pages-div{
+    grid-area: pages;
+}
+#new-book-pagesread-div{
+    grid-area: pagesread;
+}
+#new-book-status-fieldset{
+    grid-area: status;
+}
+
+form>.input-field{
+    display: grid; 
+    grid-template-columns: 5.5em 1fr;
+    grid-template-areas:
+        "label input"; 
+    overflow: hidden;
+    border-radius: var(--dialog-form-radius);
+    border: 1px solid var(--dialog-input-border-color);
+}
+
+form>.input-field#new-book-pages-div,
+form>.input-field#new-book-pagesread-div{
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "label"
+        "input";  
+}
+
+form .input-field label{
+    grid-area: label;
+    background-color: var(--dialog-label-color);
+    padding-left: var(--radius);
+    padding-right: var(--radius);
+}
+
+form .input-field input,
+form .input-field select{
+    font-size: var(--dialog-fontsize);
+    line-height: var(--dialog-input-lineheight);
+    grid-area: input;
+    padding-left: var(--radius);
+    padding-right: var(--radius);
+    border: none;
+    outline: none;
+}
+
+form>div input[type='number']{
+    padding-right: 0;
+}
+
+form>div input:required+label:after{
+    content: ' *';
+    color: var(--col-highlight);
+}
+.note{
+    font-style: italic;
+}
+.required-span{
+    color: var(--col-highlight);
+    font-style: normal;
+}
+
+form>div:hover label{
+    background-color: var(--dialog-input-border-color);
+}
+
+form>div input:focus+label{
+    background-color: var(--dialog-label-focus-color);
+    font-weight: bold;
+}
+
+
+form #new-book-status-fieldset{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--dialog-input-border-color);
+    border-radius: var(--radius);
+    outline: none;
+    /* align-self: end; */
+}
+
+form #new-book-status-fieldset input{
+    display: none;
+}
+
+form #new-book-status-fieldset label{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--unselected-fontsize);
+    line-height: calc(2 * var(--dialog-input-lineheight));
+    flex: 1;
+    height: 100%;
+}
+
+form #new-book-status-fieldset input:checked+label{
+    background-color: var(--col-txt);
+    color: var(--dialog-bg-col);
+    font-size: var(--dialog-fontsize);
+    border-radius: var(--radius);
+    flex: 3;
+}
+
+
+
+/* tablet and desktop */
+@media only screen and (min-width: 768px), (orientation: landscape){
+    .dialog-form{
+        grid-template-columns: 3fr 2fr;
+        grid-template-areas: 
+        "title title"
+        "author author"
+        "genre year"
+        "status pages"
+        "status pagesread";
+    }
+
+    form>.input-field#new-book-year-div,
+    form>.input-field#new-book-pages-div,
+    form>.input-field#new-book-pagesread-div{
+        grid-template-columns: 7.3em 1fr;
+        grid-template-areas:
+            "label input";  
+    }
+
 }
 
 
