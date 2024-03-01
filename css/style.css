@@ -23,9 +23,9 @@
 
     --dialog-bg-col:            var(--col-purewhite); 
 
-    --book-itm-bg-col:          var(--col-accent-light);
+    --book-itm-bg-col:          var(--col-white);
     --book-title-author-bg-col: var(--col-with-alpha);
-    --book-title-bg-col-hover:  var(--col-with-alpha-dark); /*var(--col-accent-light)*/
+    --book-title-bg-col-hover:  var(--col-accent-light); /*var(--col-accent-light)*/
     --book-data-bg-col:         var(--col-black);
 
     /* Colors (text/icons)*/
@@ -71,8 +71,8 @@
 
     --hdr-fontsize:             1.4rem;
     --hdr-btn-fontsize:         0.8rem;
-    --book-title-fontsize:      1.3rem;
-    --book-author-fontsize:     1.1rem;
+    --book-title-fontsize:      2rem;
+    --book-author-fontsize:     1.05rem;
     --book-data-fontsize:       1.8rem;
     --book-data-lbl-fontsize:   1rem;
     --book-pages-read-fontsize: 0.7em;
@@ -80,6 +80,10 @@
     --book-addedon-fontsize:    0.8rem;
     --book-addedon-var-fontsize: 0.9rem;
     --book-page-btn-fontsize:   1rem;
+
+    --book-title-rows: 2;
+    --boook-title-height: calc(var(--book-title-fontsize) * var(--txt-lineheight) * var(--book-title-rows)
+                            + 2 * var(--book-box-padding));
 
     /* Text clamping: number of lines */
     /* --main-itm-project-description-max-lines: 6;
@@ -157,13 +161,17 @@ html {
     line-height: var(--txt-lineheight);
 }
 
-* {
+*,
+*:before,
+*:after{
     font-family: inherit;
+    font-size: 100%;
     line-height: inherit;
     color: inherit;
     box-sizing: border-box;
     padding: 0;
     margin: 0;
+    vertical-align: baseline;
 }
 
 body {
@@ -381,6 +389,21 @@ main{
     color: var(--book-title-col);
     background-color: var(--book-title-author-bg-col);
     text-wrap: balance;
+
+    min-height: var(--boook-title-height);
+    max-height: var(--boook-title-height); 
+    height: var(--boook-title-height);
+    width: 100%;
+}
+
+.book-title-section h2{
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px var(--col-black);
 }
 
 .book-author-section{   

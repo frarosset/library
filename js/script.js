@@ -17,6 +17,26 @@ function removeDescendants(elem){
     }
 }
 
+// from: https://stackoverflow.com/a/143889
+// Determines if the passed element is overflowing its bounds,
+// either vertically or horizontally.
+// Will temporarily modify the "overflow" style to detect this
+// if necessary.
+function checkOverflow(el)
+{
+   let curOverflow = el.style.overflow;
+
+   if ( !curOverflow || curOverflow === "visible" )
+      el.style.overflow = "hidden";
+
+   let isOverflowing = el.clientWidth < el.scrollWidth 
+                    || el.clientHeight < el.scrollHeight;
+
+   el.style.overflow = curOverflow;
+
+   return isOverflowing;
+}
+
 /* Book Constructor --------------------------------------- */
 
 function Book(state, title, author, pages, genre='-', year='-', pagesRead = 0) {
@@ -322,6 +342,38 @@ function createStatusSvg(){
     return statusSvg;
 }
 
+function adaptBookTitlesSizeResize_callback(){
+    // wait some time before calling the actual resize function,
+    // to avoid calling it multiple times
+    // see https://stackoverflow.com/a/27923937
+    clearTimeout(window.resizedFinished);
+    window.resizedFinished = setTimeout(function(){
+        adaptBookTitlesSize();
+    }, 200);
+}
+
+function adaptBookTitlesSize(){
+    let defaultFontSize = window.getComputedStyle(document.documentElement).getPropertyValue('--book-title-fontsize');;
+    // ForEach book title section h2, check if the text overflows: in that case, scale down its size.
+    let bookTitleSection_divs = [...document.querySelectorAll(".book-title-section h2")];
+    bookTitleSection_divs.forEach((titleSection)=> {
+        fitFontSize(titleSection,defaultFontSize);
+    });
+}
+
+function fitFontSize(elem, defaultFontSize='',delta=0.9){
+    // Initialize the fontSize, if the initial value is provided
+    if (defaultFontSize)
+        elem.style.fontSize = defaultFontSize;
+    let fontSize = getComputedStyle(elem).getPropertyValue('font-size');
+    let fontSizeVal = fontSize.match(/[\d.]+/)[0];
+    let fontSizeUnit = fontSize.match(/[^\d.]+/)[0];
+    while (checkOverflow(elem)){
+        fontSizeVal *= delta;
+        elem.style.fontSize = fontSizeVal + fontSizeUnit;
+    }
+}
+
 /* bookBox -> .favourite is optional */
 
 /* Buttons callbacks */
@@ -362,6 +414,8 @@ function initLibrary(library,numOfBooks){ // library is an object, passed by ref
         booksContainer.appendChild(bookBox);
     }
 
+    adaptBookTitlesSize();
+
     let newBookBtn = document.querySelector(".header-container button.new-book");
     let newBookDialog = document.querySelector("#dialog-new-book");
 
@@ -394,6 +448,7 @@ function initLibrary(library,numOfBooks){ // library is an object, passed by ref
     //newBookAddBtn.addEventListener('click',newBookAdd_callback); /* TODO */  
     clearAllYesBtn.addEventListener('click',clearAll_callback);
 
+    window.addEventListener('resize',adaptBookTitlesSizeResize_callback);
 }
 
 
