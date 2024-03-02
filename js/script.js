@@ -51,6 +51,9 @@ function Book(state, title, author, pages, genre='-', year='-', pagesRead = 0) {
     currentId++;
     this.id = currentId;
     this.addedOn = new Date(Date.now());
+
+    // Update the state
+    this.updateState();
 }
 
 Book.prototype.stateFormatted = function () {
@@ -165,7 +168,7 @@ Library.prototype.addBook = function (book) {
                     <div class="book-data book-pages"><div class="var-data var-pages"><span class="var-input-data var-pages-read">64 /</span> 123</div>
                     <div class="pages-lbl-with-buttons"><button class="decrease-pages">-</button>pages<button class="increase-pages">+</button></div>
                 </div>
-                    <div class="book-status">
+                    <div class="book-state">
                         <!-- https://nikitahl.github.io/svg-circle-progress-generator/ -->
                         <svg width="100%" height="100%" viewBox="-44.035 -40 199.035 195" version="1.1" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg)">
                             <circle r="47.5" cx="57.5" cy="57.5" fill="transparent" stroke="#e0e0e0" stroke-width="50" stroke-dasharray="298.3px" stroke-dashoffset="0"></circle>
@@ -325,13 +328,13 @@ function createNewBookBox(newBook){
     bookPagesSection_div.appendChild(bookPagesSection_div_lbl);
     bookDataSection.appendChild(bookPagesSection_div);
 
-    /* status */
-    let bookStatusSection_div = document.createElement('div');
-    bookStatusSection_div.classList.add('book-status');
+    /* state */
+    let bookstateSection_div = document.createElement('div');
+    bookstateSection_div.classList.add('book-state');
 
-    let bookStatusSvg = createStatusSvg();
-    bookStatusSection_div.appendChild(bookStatusSvg);
-    bookDataSection.appendChild(bookStatusSection_div);
+    let bookstateSvg = createstateSvg();
+    bookstateSection_div.appendChild(bookstateSvg);
+    bookDataSection.appendChild(bookstateSection_div);
 
     bookBox.appendChild(bookDataSection);
 
@@ -374,7 +377,7 @@ function createNewBookBox(newBook){
     /* Append useful info on buttons and add event listeners */
     bookBox.book = newBook;
     bookBox.readPagesDiv = bookPagesSection_div_var_read;
-    bookBox.bookStatusSvg = bookStatusSvg;
+    bookBox.bookstateSvg = bookstateSvg;
 
     bookPagesSection_div_btn1.addEventListener('click',decreaseReadPages_callback);
     bookPagesSection_div_btn2.addEventListener('click',increaseReadPages_callback);
@@ -385,7 +388,7 @@ function createNewBookBox(newBook){
     return bookBox;
 }
 
-function createStatusSvg(){
+function createstateSvg(){
     // SVG code for the circle progress from:
     // https://nikitahl.github.io/svg-circle-progress-generator/
     // SVG code for the circular text from:
@@ -396,13 +399,13 @@ function createStatusSvg(){
     let svgNS = 'http://www.w3.org/2000/svg';
 
     // Create an element within the svg - namespace (svgNS)
-    let statusSvg = document.createElementNS(svgNS, 'svg');
+    let stateSvg = document.createElementNS(svgNS, 'svg');
 
-    statusSvg.setAttribute('width',     '100%');
-    statusSvg.setAttribute('height',    '100%');
-    statusSvg.setAttribute('viewBox',   '-44.035 -40 199.035 195');
-    statusSvg.setAttribute('version',   '1.1');
-    statusSvg.setAttribute('style',     'transform:rotate(-90deg)');
+    stateSvg.setAttribute('width',     '100%');
+    stateSvg.setAttribute('height',    '100%');
+    stateSvg.setAttribute('viewBox',   '-44.035 -40 199.035 195');
+    stateSvg.setAttribute('version',   '1.1');
+    stateSvg.setAttribute('style',     'transform:rotate(-90deg)');
 
     /* Outer circle */
     let outerCircle = document.createElementNS(svgNS, 'circle');
@@ -449,13 +452,16 @@ function createStatusSvg(){
     circularText.appendChild(circularTextPath);
 
     /* Append the elements to the main svg */
-    statusSvg.appendChild(outerCircle);
-    statusSvg.appendChild(innerCircle);
-    statusSvg.appendChild(circularPath);
-    statusSvg.appendChild(circularText);
+    stateSvg.appendChild(outerCircle);
+    stateSvg.appendChild(innerCircle);
+    stateSvg.appendChild(circularPath);
+    stateSvg.appendChild(circularText);
+
+    stateSvg.progressCircle = innerCircle;
+    stateSvg.stateText = circularTextPath;
 
     /* return the new svg image*/
-    return statusSvg;
+    return stateSvg;
 }
 
 function updateBookInfo(bookBox,book){
@@ -463,12 +469,25 @@ function updateBookInfo(bookBox,book){
     bookBox.readPagesDiv.textContent = book.pagesRead;
 
     // Update the displayed progress of reading
-    setBookStatus(bookBox.bookStatusSvg,book);
+    setBookstate(bookBox.bookstateSvg,book);
 }
 
-function setBookStatus(bookStatusSvg,book){
-    console.log('TODO: update status div');
-    // TODO
+function splitCSSUnits(CSSAttrVal){
+    return [CSSAttrVal.match(/[\d.]+/)[0], CSSAttrVal.match(/[^\d.]+/)[0]];
+}
+
+function setBookstate(bookstateSvg,book){
+    // for progress circle, stroke-dashoffset = stroke-dasharray * (1-progress)
+
+    let strokeDasharray = bookstateSvg.progressCircle.getAttribute('stroke-dasharray');
+    let strokeDasharrayVal,strokeDasharrayUnit;
+    [strokeDasharrayVal,strokeDasharrayUnit] = splitCSSUnits(strokeDasharray);
+
+    let strokeDashoffsetVal = strokeDasharrayVal*(1-book.progress);
+
+    bookstateSvg.progressCircle.setAttribute('stroke-dashoffset',strokeDashoffsetVal + strokeDasharrayUnit);
+
+    bookstateSvg.stateText.textContent = book.state;
 }
 
 function adaptBookTitlesSize(){
@@ -485,8 +504,10 @@ function fitFontSize(elem, defaultFontSize='',delta=0.9){
     if (defaultFontSize)
         elem.style.fontSize = defaultFontSize;
     let fontSize = getComputedStyle(elem).getPropertyValue('font-size');
-    let fontSizeVal = fontSize.match(/[\d.]+/)[0];
-    let fontSizeUnit = fontSize.match(/[^\d.]+/)[0];
+
+    let fontSizeVal,fontSizeUnit; 
+    [fontSizeVal,fontSizeUnit] = splitCSSUnits(fontSize);
+
     while (checkOverflow(elem)){
         fontSizeVal *= delta;
         elem.style.fontSize = fontSizeVal + fontSizeUnit;
@@ -563,6 +584,7 @@ function initLibrary(library,numOfBooks){ // library is an object, passed by ref
 
         /* Add it to the DOM */
         let bookBox = createNewBookBox(book);
+        updateBookInfo(bookBox,book);
         booksContainer.appendChild(bookBox);
     }
 

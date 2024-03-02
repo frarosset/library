@@ -10,8 +10,8 @@
     --col-accent-dark:   #EF6461;
     --col-accent-light:  #E4B363;
 
-    --col-with-alpha:     rgba(232, 233, 235, 0.9); /*#E8E9EB with alpha*/
-    --col-with-alpha-dark:rgba(228, 179, 99, 0.9); /*#E4B363 with alpha*/
+    --col-with-alpha:     rgba(232, 233, 235, 0.7); /*#E8E9EB with alpha*/
+    --col-with-alpha-dark:rgba(232, 233, 235, 1); /*#E4B363 with alpha*/
     --col-transparent:    rgba(0, 0, 0, 0); 
 
     /* Colors (background)*/
@@ -23,9 +23,10 @@
 
     --dialog-bg-col:            var(--col-purewhite); 
 
-    --book-itm-bg-col:          var(--col-white);
-    --book-title-author-bg-col: var(--col-with-alpha);
+    --book-itm-bg-col:          var(--col-with-alpha);
+    --book-author-bg-col:       var(--col-with-alpha);
     --book-title-bg-col-hover:  var(--col-accent-light); /*var(--col-accent-light)*/
+    --book-author-bg-col-hover: var(--col-with-alpha-dark);
     --book-data-bg-col:         var(--col-black);
 
     /* Colors (text/icons)*/
@@ -76,7 +77,7 @@
     --book-data-fontsize:       1.8rem;
     --book-data-lbl-fontsize:   1rem;
     --book-pages-read-fontsize: 0.7em;
-    --book-status-fontsize:     2.1rem;
+    --book-state-fontsize:     2.6rem;
     --book-addedon-fontsize:    0.8rem;
     --book-addedon-var-fontsize: 0.9rem;
     --book-page-btn-fontsize:   1rem;
@@ -123,9 +124,9 @@
     --book-box-padding:     10px;
     --book-box-data-gap:    5px 10px;
 
-    --book-status-height:   60px;
+    --book-state-height:   60px;
     --book-property-height: calc(calc(var(--book-data-lbl-fontsize) + var(--book-data-fontsize)) * var(--txt-lineheight));
-    --book-data-height: calc(calc(2 * var(--book-box-padding)) + calc(1 * var(--book-property-height)) + max(var(--book-property-height),var(--book-status-height))); /* plus gap --------------------------------------------------------*/
+    --book-data-height: calc(calc(2 * var(--book-box-padding)) + calc(1 * var(--book-property-height)) + max(var(--book-property-height),var(--book-state-height))); /* plus gap --------------------------------------------------------*/
 
     --book-pages-btns-gap:  5px;
 
@@ -387,7 +388,7 @@ main{
     text-align: center;
     font-variant: small-caps;
     color: var(--book-title-col);
-    background-color: var(--book-title-author-bg-col);
+    background-color: var(--book-author-bg-col);
     text-wrap: balance;
 
     min-height: var(--boook-title-height);
@@ -403,7 +404,7 @@ main{
     display: flex;
     align-items: center;
     justify-content: center;
-    text-shadow: 1px 1px 2px var(--col-black);
+    text-shadow: 1.5px 1px 3px var(--col-white);
 }
 
 .book-author-section{   
@@ -413,7 +414,7 @@ main{
     font-size: var(--book-author-fontsize);
     text-align: right;
     color: var(--book-author-col);
-    background-color: var(--book-title-author-bg-col);
+    background-color: var(--book-author-bg-col);
 }
 
 .book-author-section .book-author .var-author{
@@ -444,7 +445,7 @@ main{
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
     grid-template-areas:
         "genre year"
-        "pages  status";
+        "pages  state";
     align-items: end;
     justify-items: center;
     text-align: center;
@@ -514,29 +515,29 @@ main{
     justify-content: center;
 }
 
-/* Book box - data section (status) */
+/* Book box - data section (state) */
 
-.book-status{
-    grid-area: status;
+.book-state{
+    grid-area: state;
     display: flex;
     align-items: center;
 }
 
-.book-status svg {
+.book-state svg {
     width: auto;
-    height: var(--book-status-height);
-    font-size: var(--book-status-fontsize);
+    height: var(--book-state-height);
+    font-size: var(--book-state-fontsize);
 }
 
-.book-status svg circle:first-child{
+.book-state svg circle:first-child{
     stroke: var(--bg-col);
 }
 
-.book-status svg circle:nth-child(2){
-    stroke: var(--col-black);
+.book-state svg circle:nth-child(2){
+    stroke: var(--book-highlight-col);
 }
 
-.book-status svg textPath{
+.book-state svg textPath{
     fill: var(--book-data-alt-col);
     font-variant: small-caps;
 }
@@ -583,6 +584,11 @@ main{
     color: var(--book-title-col-hover);
 }
 
+.book-box:hover .book-author-section{
+    background-color: var(--book-author-bg-col-hover);
+    color: var(--book-title-col-hover);
+}
+
 .book-box:hover .book-image-section{
     height: 0;
 }
@@ -597,7 +603,7 @@ main{
     background-color: var(--book-data-bg-col);
 }
 
-.book-box:hover .book-status svg circle:nth-child(2){
+.book-box:hover .book-state svg circle:nth-child(2){
     stroke: var(--book-highlight-col);;
 }
 
@@ -677,7 +683,7 @@ dialog#dialog-new-book{
     "author author"
     "genre genre"
     "year year"
-    "status status"
+    "state state"
     "pages pagesread";
     gap: var(--dialog-form-gap);
 }
@@ -700,8 +706,8 @@ dialog#dialog-new-book{
 #new-book-pagesread-div{
     grid-area: pagesread;
 }
-#new-book-status-fieldset{
-    grid-area: status;
+#new-book-state-fieldset{
+    grid-area: state;
 }
 
 form>.input-field{
@@ -766,7 +772,7 @@ form>div input:focus+label{
 }
 
 
-form #new-book-status-fieldset{
+form #new-book-state-fieldset{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -776,11 +782,11 @@ form #new-book-status-fieldset{
     /* align-self: end; */
 }
 
-form #new-book-status-fieldset input{
+form #new-book-state-fieldset input{
     display: none;
 }
 
-form #new-book-status-fieldset label{
+form #new-book-state-fieldset label{
     display: flex;
     align-items: center;
     justify-content: center;
@@ -790,7 +796,7 @@ form #new-book-status-fieldset label{
     height: 100%;
 }
 
-form #new-book-status-fieldset input:checked+label{
+form #new-book-state-fieldset input:checked+label{
     background-color: var(--col-txt);
     color: var(--dialog-bg-col);
     font-size: var(--dialog-fontsize);
@@ -808,8 +814,8 @@ form #new-book-status-fieldset input:checked+label{
         "title title"
         "author author"
         "genre year"
-        "status pages"
-        "status pagesread";
+        "state pages"
+        "state pagesread";
     }
 
     form>.input-field#new-book-year-div,
