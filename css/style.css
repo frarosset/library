@@ -69,7 +69,7 @@
     --dialog-input-lineheight: 2;
     --unselected-fontsize: calc(var(--dialog-fontsize) * 0.5);
 
-    --hdr-fontsize:             1.4rem;
+    --hdr-fontsize:             2rem;
     --hdr-btn-fontsize:         0.8rem;
     --book-title-fontsize:      2rem;
     --book-author-fontsize:     1.05rem;
@@ -483,9 +483,11 @@ main{
     align-self: center;
 }
 
-.book-pages .var-pages-read{
+.book-pages .var-pages-read,
+.book-pages .var-pages-read-style{
     color: var(--book-data-alt-col);
     font-size: var(--book-pages-read-fontsize);
+    text-transform: full-width;
 }
 
 .book-pages .pages-lbl-with-buttons{

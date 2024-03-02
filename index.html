@@ -87,53 +87,6 @@
     </header>
     <main class="main-container">
         <div class="books-container">
-            <div class="book-box favourite">
-                <div class="book-section book-title-section">
-                    <h2 class="book-title"><div class="var-data var-title">The Hobbit</div></h2>
-                    <!-- <div class="book-year">(<span class="var-year">1937</span>)</div> -->
-                </div>
-                <div class="book-section book-author-section">
-                    <div class="book-author">by <span class="var-data var-author">J.R.R. Tolkien</span></div>
-                </div>
-                <div class="book-section book-image-section">
-                </div>
-                <div class="book-section book-data-section">
-                    <div class="book-data book-genre"><div class="var-data var-genre">Fantasy</div><div>genre</div></div>
-                    <div class="book-data book-year"><div class="var-data var-year">1937</div><div>year</div></div>
-                    <div class="book-data book-pages"><div class="var-data var-pages"><span class="var-input-data var-pages-read">64 /</span> 123</div>
-                    <div class="pages-lbl-with-buttons"><button class="decrease-pages">-</button>pages<button class="increase-pages">+</button></div>
-                </div>
-                    <div class="book-status">
-                        <!-- https://nikitahl.github.io/svg-circle-progress-generator/ -->
-                        <svg width="100%" height="100%" viewBox="-44.035 -40 199.035 195" version="1.1" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg)">
-                            <circle r="47.5" cx="57.5" cy="57.5" fill="transparent" stroke="#e0e0e0" stroke-width="50" stroke-dasharray="298.3px" stroke-dashoffset="0"></circle>
-                            <circle r="47.5" cx="57.5" cy="57.5" stroke="#e31616" stroke-width="33" stroke-linecap="round" stroke-dashoffset="149px" fill="transparent" stroke-dasharray="298.3px"></circle> <!-- stroke-dashoffset = stroke-dasharray * (1-30%) -->
-                            <!-- -->
-                            <!-- https://stackoverflow.com/questions/5737975/circle-drawing-with-svgs-arc-path -->
-                            <path id="curve" fill="transparent"
-                                    d="
-                                    M 57.5, 57.5
-                                    m 97.5, 0
-                                    a 97.5,97.5 0 1,0 -195,0
-                                    a 97.5,97.5 0 1,0  195,0
-                                    " />
-                            <text width="50">
-                                <textPath xlink:href="#curve" startOffset="50%" fill='#ffffff' method="stretch" spacing="auto" text-anchor="middle">
-                                    halfway through
-                                </textPath>
-                            </text>
-                        </svg>
-                    </div>
-                </div>
-                <div class="book-section book-footer-section">  
-                    <div class="book-icons">
-                        <div class="icon like">❤</div>
-                        <div class="icon share">❤</div>
-                        <div class="icon del">❤</div>
-                    </div>
-                    <div class="book-addedon">inserted on <span class="var-data var-addedon">10/2/2024</span></div>
-                </div>
-            </div>
         </div>
     </main>
     <footer>

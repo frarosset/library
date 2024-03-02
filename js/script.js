@@ -69,6 +69,58 @@ Book.prototype.printInfo = function () {
     console.log(this.info())
 };
 
+Book.prototype.incrementReadPages = function (n=1) {
+    // this returns the number of incremented pages
+    // The book is read! No more pages to read
+    if (this.pagesRead == this.pages || n<=0)
+        return 0;
+
+    // n can be larger than 1: adjust it if needed
+    n = Math.min(n,this.pages-this.pagesRead);
+
+    // Increase the read pages number
+    this.pagesRead += n;
+
+    // Update the state
+    this.updateState();
+
+    return n;
+}
+
+Book.prototype.decrementReadPages = function (n=1) {
+    // this returns the number of decremented pages
+    // The book is read! No more pages to read
+    if (this.pagesRead == 0 || n<=0)
+        return 0;
+
+    // n can be larger than 1: adjust it if needed
+    n = Math.min(n,this.pagesRead);
+    
+    // Increase the read pages number
+    this.pagesRead -= n;
+
+    // Update the state
+    this.updateState();
+
+    return n;
+}
+
+Book.prototype.updateState = function () {
+    if (this.pagesRead == 0){
+        this.progress = 0;
+        this.state = statesOfRead[0];
+    } else if (this.pagesRead == this.pages){
+        this.progress = 1;
+        this.state = statesOfRead[statesOfRead.length-1];
+    } else if (this.pagesRead > 0 && this.pagesRead < this.pages){
+        this.progress = this.pagesRead / this.pages;
+        let N = statesOfRead.length;
+        let interval = 1/(N-2);
+        let stateIndex = Math.floor(this.progress/interval);
+        this.state = statesOfRead[stateIndex+1];
+    }
+}
+
 /* Library Constructor --------------------------------------- */
 
 function Library() {
@@ -96,7 +148,55 @@ Library.prototype.addBook = function (book) {
 }
 
 /* Book Box (DOM)*/
-
+/* HTML CODE TO GENERATE:
+<div class="book-box favourite">
+                <div class="book-section book-title-section">
+                    <h2 class="book-title"><div class="var-data var-title">The Hobbit</div></h2>
+                    <!-- <div class="book-year">(<span class="var-year">1937</span>)</div> -->
+                </div>
+                <div class="book-section book-author-section">
+                    <div class="book-author">by <span class="var-data var-author">J.R.R. Tolkien</span></div>
+                </div>
+                <div class="book-section book-image-section">
+                </div>
+                <div class="book-section book-data-section">
+                    <div class="book-data book-genre"><div class="var-data var-genre">Fantasy</div><div>genre</div></div>
+                    <div class="book-data book-year"><div class="var-data var-year">1937</div><div>year</div></div>
+                    <div class="book-data book-pages"><div class="var-data var-pages"><span class="var-input-data var-pages-read">64 /</span> 123</div>
+                    <div class="pages-lbl-with-buttons"><button class="decrease-pages">-</button>pages<button class="increase-pages">+</button></div>
+                </div>
+                    <div class="book-status">
+                        <!-- https://nikitahl.github.io/svg-circle-progress-generator/ -->
+                        <svg width="100%" height="100%" viewBox="-44.035 -40 199.035 195" version="1.1" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg)">
+                            <circle r="47.5" cx="57.5" cy="57.5" fill="transparent" stroke="#e0e0e0" stroke-width="50" stroke-dasharray="298.3px" stroke-dashoffset="0"></circle>
+                            <circle r="47.5" cx="57.5" cy="57.5" stroke="#e31616" stroke-width="33" stroke-linecap="round" stroke-dashoffset="149px" fill="transparent" stroke-dasharray="298.3px"></circle> <!-- stroke-dashoffset = stroke-dasharray * (1-30%) -->
+                            <!-- -->
+                            <!-- https://stackoverflow.com/questions/5737975/circle-drawing-with-svgs-arc-path -->
+                            <path id="curve" fill="transparent"
+                                    d="
+                                    M 57.5, 57.5
+                                    m 97.5, 0
+                                    a 97.5,97.5 0 1,0 -195,0
+                                    a 97.5,97.5 0 1,0  195,0
+                                    " />
+                            <text width="50">
+                                <textPath xlink:href="#curve" startOffset="50%" fill='#ffffff' method="stretch" spacing="auto" text-anchor="middle">
+                                    halfway through
+                                </textPath>
+                            </text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="book-section book-footer-section">  
+                    <div class="book-icons">
+                        <div class="icon like">❤</div>
+                        <div class="icon share">❤</div>
+                        <div class="icon del">❤</div>
+                    </div>
+                    <div class="book-addedon">inserted on <span class="var-data var-addedon">10/2/2024</span></div>
+                </div>
+            </div>
+*/
 function createNewBookBox(newBook){
     let bookBox = document.createElement('div');
     bookBox.classList.add('book-box');
@@ -186,12 +286,18 @@ function createNewBookBox(newBook){
 
     let bookPagesSection_div_var_read = document.createElement('span');
     bookPagesSection_div_var_read.classList.add('var-input-data','var-pages-read');
-    bookPagesSection_div_var_read.textContent = newBook.pagesRead + ' / ';
+    bookPagesSection_div_var_read.textContent = newBook.pagesRead;
+
+    let bookPagesSection_div_var_bar = document.createElement('span');
+    bookPagesSection_div_var_bar.classList.add('var-pages-read-style');
+    bookPagesSection_div_var_bar.textContent = ' / ';
+
 
     let bookPagesSection_div_var_tot = document.createElement('span');
     bookPagesSection_div_var_tot.textContent = newBook.pages;
 
     bookPagesSection_div_var.appendChild(bookPagesSection_div_var_read);
+    bookPagesSection_div_var.appendChild(bookPagesSection_div_var_bar);
     bookPagesSection_div_var.appendChild(bookPagesSection_div_var_tot);
 
     //lbl
@@ -265,6 +371,16 @@ function createNewBookBox(newBook){
 
     bookBox.appendChild(bookFooterSection);
 
+    /* Append useful info on buttons and add event listeners */
+    bookBox.book = newBook;
+    bookBox.readPagesDiv = bookPagesSection_div_var_read;
+    bookBox.bookStatusSvg = bookStatusSvg;
+
+    bookPagesSection_div_btn1.addEventListener('click',decreaseReadPages_callback);
+    bookPagesSection_div_btn2.addEventListener('click',increaseReadPages_callback);
+    bookPagesSection_div_btn1.bookBoxDiv = bookBox;
+    bookPagesSection_div_btn2.bookBoxDiv = bookBox;
+    
     /* return the new book box*/
     return bookBox;
 }
@@ -342,14 +458,17 @@ function createStatusSvg(){
     return statusSvg;
 }
 
-function adaptBookTitlesSizeResize_callback(){
-    // wait some time before calling the actual resize function,
-    // to avoid calling it multiple times
-    // see https://stackoverflow.com/a/27923937
-    clearTimeout(window.resizedFinished);
-    window.resizedFinished = setTimeout(function(){
-        adaptBookTitlesSize();
-    }, 200);
+function updateBookInfo(bookBox,book){
+    // Update the displayed pages read string
+    bookBox.readPagesDiv.textContent = book.pagesRead;
+
+    // Update the displayed progress of reading
+    setBookStatus(bookBox.bookStatusSvg,book);
+}
+
+function setBookStatus(bookStatusSvg,book){
+    console.log('TODO: update status div');
+    // TODO
 }
 
 function adaptBookTitlesSize(){
@@ -398,10 +517,43 @@ function clearAll_callback(e){
     e.target.associatedModal.close();
 }
 
+function increaseReadPages_callback(e){
+    let elem = e.target;
+    let thisBook = elem.bookBoxDiv.book;
+
+    // The book is read! No more pages to read
+    if (!thisBook.incrementReadPages(1))
+        return;
+
+    updateBookInfo(elem.bookBoxDiv,thisBook);
+}
+
+function decreaseReadPages_callback(e){
+    let elem = e.target;
+    let thisBook = elem.bookBoxDiv.book;
+
+    // The book is not started! No more pages to decrement
+    if (!thisBook.decrementReadPages(1))
+        return;
+
+    updateBookInfo(elem.bookBoxDiv,thisBook);
+}
+
+function adaptBookTitlesSizeResize_callback(){
+    // wait some time before calling the actual resize function,
+    // to avoid calling it multiple times
+    // see https://stackoverflow.com/a/27923937
+    clearTimeout(window.resizedFinished);
+    window.resizedFinished = setTimeout(function(){
+        adaptBookTitlesSize();
+    }, 200);
+}
+
+
 /* Get template data --------------------------------------- */
 
 function initLibrary(library,numOfBooks){ // library is an object, passed by reference
-    let booksContainer = document.querySelector(".books-container");
+    currentId = -1;
 
     for (let i=0; i<numOfBooks; i++){
         let bookData = sampleBooks[i];
@@ -450,7 +602,6 @@ function initLibrary(library,numOfBooks){ // library is an object, passed by ref
 
     window.addEventListener('resize',adaptBookTitlesSizeResize_callback);
 }
-
 
 /* Some sample data --------------------------------------- */
 
