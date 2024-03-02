@@ -379,8 +379,19 @@ function createNewBookBox(newBook){
     bookBox.readPagesDiv = bookPagesSection_div_var_read;
     bookBox.bookstateSvg = bookstateSvg;
 
-    bookPagesSection_div_btn1.addEventListener('click',decreaseReadPages_callback);
-    bookPagesSection_div_btn2.addEventListener('click',increaseReadPages_callback);
+    //bookPagesSection_div_btn1.addEventListener('click',decreaseReadPages_callback);
+    // bookPagesSection_div_btn2.addEventListener('click',increaseReadPages_callback);
+
+    bookPagesSection_div_btn1.addEventListener('pointerdown',startDecreaseReadPages_callback);
+    bookPagesSection_div_btn1.addEventListener('pointerup',stopChangeReadPages_callback);
+    bookPagesSection_div_btn1.addEventListener('pointerout',stopChangeReadPages_callback);
+
+    bookPagesSection_div_btn2.addEventListener('pointerdown',startIncreaseReadPages_callback);
+    bookPagesSection_div_btn2.addEventListener('pointerup',stopChangeReadPages_callback);
+    bookPagesSection_div_btn2.addEventListener('pointerout',stopChangeReadPages_callback);
+
+
+
     bookPagesSection_div_btn1.bookBoxDiv = bookBox;
     bookPagesSection_div_btn2.bookBoxDiv = bookBox;
     
@@ -558,6 +569,27 @@ function decreaseReadPages_callback(e){
         return;
 
     updateBookInfo(elem.bookBoxDiv,thisBook);
+}
+
+function startDecreaseReadPages_callback(e){
+    let btn = e.target;
+    decreaseReadPages_callback(e);
+    clearInterval(btn.interval);
+    btn.interval = setInterval(function(e){
+        decreaseReadPages_callback(e);
+    }, 200, e);
+}
+function startIncreaseReadPages_callback(e){
+    let btn = e.target;
+    increaseReadPages_callback(e);
+    clearInterval(btn.interval);
+    btn.interval = setInterval(function(e){
+        increaseReadPages_callback(e);
+    }, 200, e);
+}
+function stopChangeReadPages_callback(e){
+    let btn = e.target;
+    clearInterval(btn.interval);
 }
 
 function adaptBookTitlesSizeResize_callback(){
