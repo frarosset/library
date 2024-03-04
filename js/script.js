@@ -165,9 +165,8 @@ Library.prototype.addBook = function (book) {
                 <div class="book-section book-data-section">
                     <div class="book-data book-genre"><div class="var-data var-genre">Fantasy</div><div>genre</div></div>
                     <div class="book-data book-year"><div class="var-data var-year">1937</div><div>year</div></div>
-                    <div class="book-data book-pages"><div class="var-data var-pages"><span class="var-input-data var-pages-read">64 /</span> 123</div>
-                    <div class="pages-lbl-with-buttons"><button class="decrease-pages">-</button>pages<button class="increase-pages">+</button></div>
-                </div>
+                    <div class="book-data book-pages"><div class="var-data var-pages"><span class="var-input-data var-pages-read">64</span><span class="var-pages-read-style"> / </span> 123 <div>pages</div></div>
+                    <div class="pages-buttons"><button class="decrease-pages">-</button><button class="increase-pages">+</button></div>
                     <div class="book-state">
                         <!-- https://nikitahl.github.io/svg-circle-progress-generator/ -->
                         <svg width="100%" height="100%" viewBox="-44.035 -40 199.035 195" version="1.1" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg)">
@@ -205,9 +204,12 @@ function createNewBookBox(newBook){
     bookBox.classList.add('book-box');
 
     /* Generate an unique background (here use a lorem ipsum image)*/
-    bookBox.style.backgroundImage= `url('https://picsum.photos/400/600?random=${newBook.id}')`;
+    bookBox.style.backgroundImage= `url('https://picsum.photos/400/500?random=${newBook.id}')`;
 
     /* title section -------------------------------------- */
+    let bookHeaderSection = document.createElement('div');
+    bookHeaderSection.classList.add('book-header-section');
+
     let bookTitleSection = document.createElement('div');
     bookTitleSection.classList.add('book-section','book-title-section');
 
@@ -220,7 +222,6 @@ function createNewBookBox(newBook){
 
     bookTitleSection_h2.appendChild(bookTitleSection_var);
     bookTitleSection.appendChild(bookTitleSection_h2);
-    bookBox.appendChild(bookTitleSection);
 
     /* author section ------------------------------------- */
     let bookAuthorSection = document.createElement('div');
@@ -236,7 +237,10 @@ function createNewBookBox(newBook){
 
     bookAuthorSection_div.appendChild(bookAuthorSection_div_var);
     bookAuthorSection.appendChild(bookAuthorSection_div);
-    bookBox.appendChild(bookAuthorSection);
+
+    bookHeaderSection.appendChild(bookTitleSection);
+    bookHeaderSection.appendChild(bookAuthorSection);
+    bookBox.appendChild(bookHeaderSection);    
 
     /* image section (empty) --------------------------------- */
     let bookImageSection = document.createElement('div');
@@ -282,8 +286,6 @@ function createNewBookBox(newBook){
     let bookPagesSection_div = document.createElement('div');
     bookPagesSection_div.classList.add('book-data','book-pages');
 
-    //var
-
     let bookPagesSection_div_var = document.createElement('div');
     bookPagesSection_div_var.classList.add('var-data','var-pages');
 
@@ -304,29 +306,28 @@ function createNewBookBox(newBook){
     bookPagesSection_div_var.appendChild(bookPagesSection_div_var_tot);
 
     //lbl
-
-    let bookPagesSection_div_lbl = document.createElement('div');
-    bookPagesSection_div_lbl.classList.add('pages-lbl-with-buttons');
-
-    let bookPagesSection_div_btn1 = document.createElement('button');
-    bookPagesSection_div_btn1.classList.add('decrease-pages');
-    bookPagesSection_div_btn1.textContent = '-';
-
-    let bookPagesSection_div_lbl_txt = document.createElement('div'); 
-    bookPagesSection_div_lbl_txt.textContent = 'pages';
-
-    let bookPagesSection_div_btn2 = document.createElement('button');
-    bookPagesSection_div_btn2.classList.add('increase-pages');
-    bookPagesSection_div_btn2.textContent = '+';
-
-    bookPagesSection_div_lbl.appendChild(bookPagesSection_div_btn1);
-
-    bookPagesSection_div_lbl.appendChild(bookPagesSection_div_lbl_txt);
-    bookPagesSection_div_lbl.appendChild(bookPagesSection_div_btn2);
+    let bookPagesSection_div_lbl = document.createElement('div'); 
+    bookPagesSection_div_lbl.textContent = 'read pages';
 
     bookPagesSection_div.appendChild(bookPagesSection_div_var);
     bookPagesSection_div.appendChild(bookPagesSection_div_lbl);
     bookDataSection.appendChild(bookPagesSection_div);
+
+    // increase/decrease read pages btns
+
+    let bookPagesSectionBtns_div = document.createElement('div');
+    bookPagesSectionBtns_div.classList.add('book-pages-btns');
+
+    let bookPagesSection_div_btn1 = document.createElement('button');
+    bookPagesSection_div_btn1.classList.add('decrease-pages');
+    bookPagesSection_div_btn1.textContent = '-';
+    let bookPagesSection_div_btn2 = document.createElement('button');
+    bookPagesSection_div_btn2.classList.add('increase-pages');
+    bookPagesSection_div_btn2.textContent = '+';
+
+    bookPagesSectionBtns_div.appendChild(bookPagesSection_div_btn1);
+    bookPagesSectionBtns_div.appendChild(bookPagesSection_div_btn2);
+    bookDataSection.appendChild(bookPagesSectionBtns_div);
 
     /* state */
     let bookstateSection_div = document.createElement('div');

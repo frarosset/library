@@ -10,8 +10,9 @@
     --col-accent-dark:   #EF6461;
     --col-accent-light:  #E4B363;
 
-    --col-with-alpha:     rgba(232, 233, 235, 0.7); /*#E8E9EB with alpha*/
-    --col-with-alpha-dark:rgba(232, 233, 235, 1); /*#E4B363 with alpha*/
+    --col-white-with-alpha: rgba(232, 233, 235, 1); /*#E8E9EB with alpha*/
+    --col-purewhite-with-alpha: rgba(255, 255, 255, 0.8); /*#ffffff with alpha*/
+    --col-black-with-alpha:rgba(49,54,56, 0.7); /*#313638 with alpha*/
     --col-transparent:    rgba(0, 0, 0, 0); 
 
     /* Colors (background)*/
@@ -23,11 +24,9 @@
 
     --dialog-bg-col:            var(--col-purewhite); 
 
-    --book-itm-bg-col:          var(--col-with-alpha);
-    --book-author-bg-col:       var(--col-with-alpha);
-    --book-title-bg-col-hover:  var(--col-accent-light); /*var(--col-accent-light)*/
-    --book-author-bg-col-hover: var(--col-with-alpha-dark);
-    --book-data-bg-col:         var(--col-black);
+    --book-itm-bg-col:          var(--bg-col);
+    --book-title-bg-col:        var(--col-white-with-alpha);
+    --book-data-bg-col:         var(--col-black-with-alpha);
 
     /* Colors (text/icons)*/
     --col-txt:                  var(--col-black);
@@ -45,14 +44,22 @@
     --dialog-label-focus-color: var(--col-grey);
 
     --book-title-col:           var(--col-black);
-    --book-title-col-hover:     var(--col-black);
-    --book-author-col:          var(--col-black);
+    --book-author-col-secondary:var(--col-grey);
+    --book-author-col:          var(--col-purewhite);
     --book-data-col:            var(--col-accent-light);
     --book-data-lbl-col:        var(--col-grey);
     --book-data-alt-col:        var(--col-purewhite);
     --book-highlight-col:       var(--col-accent-dark);
     --book-addedon-lbl-col:     var(--book-data-lbl-col);
     --book-addedon-col:         var(--col-purewhite);
+
+    --book-page-btn-col:             var(--book-data-alt-col);
+    --book-page-btn-col-hover:       var(--book-data-alt-col);
+    --book-page-btn-col-active:      var(--col-black);
+
+    --book-page-btn-bg-col:          var(--col-black);
+    --book-page-btn-bg-col-hover:    var(--col-black-with-alpha);
+    --book-page-btn-bg-col-active:   var(--col-grey);
 
     /* Colors (icons)*/
 
@@ -74,17 +81,13 @@
     --hdr-btn-fontsize:         0.8rem;
     --book-title-fontsize:      2rem;
     --book-author-fontsize:     1.05rem;
-    --book-data-fontsize:       1.8rem;
+    --book-data-fontsize:       1.5rem;
     --book-data-lbl-fontsize:   1rem;
     --book-pages-read-fontsize: 0.7em;
     --book-state-fontsize:     2.6rem;
     --book-addedon-fontsize:    0.8rem;
     --book-addedon-var-fontsize: 0.9rem;
     --book-page-btn-fontsize:   1rem;
-
-    --book-title-rows: 2;
-    --boook-title-height: calc(var(--book-title-fontsize) * var(--txt-lineheight) * var(--book-title-rows)
-                            + 2 * var(--book-box-padding));
 
     /* Text clamping: number of lines */
     /* --main-itm-project-description-max-lines: 6;
@@ -100,7 +103,7 @@
     --dialog-padding:       20px;
     --dialog-border-width:  3px;
     --dialog-gap:           1.5rem;
-    --dialog-btn-height:    3em;
+    --dialog-btn-height:    2.2em;
     --dialog-btn-width:     5em;
     --dialog-btn-gap:       10px;
     --dialog-btn-border-width:2px;
@@ -119,29 +122,45 @@
     --books-container-gap:  20px;
 
     --book-box-max-width:   200px;
-    --book-box-height:      min-content;
 
-    --book-box-padding:     10px;
-    --book-box-data-gap:    5px 10px;
+
+    --book-title-rows: 2;
+
+    --book-box-padding:      10px;
+    --book-box-data-gap-ver: 10px;
+    --book-box-data-gap-hor: 10px;
+    --book-box-data-gap:     var(--book-box-data-gap-ver) var(--book-box-data-gap-hor);
+    --book-author-bottom-padding: var(--book-box-padding);
 
     --book-state-height:   60px;
-    --book-property-height: calc(calc(var(--book-data-lbl-fontsize) + var(--book-data-fontsize)) * var(--txt-lineheight));
-    --book-data-height: calc(calc(2 * var(--book-box-padding)) + calc(1 * var(--book-property-height)) + max(var(--book-property-height),var(--book-state-height))); /* plus gap --------------------------------------------------------*/
-
-    --book-pages-btns-gap:  5px;
-
+    --book-pages-btns-gap:  0px;
     --book-footer-icon-gap: 3px;
     --book-footer-icon-len: 6px;
 
-    --book-page-btn-height: 1.2em;
-    --book-page-btn-width:  2em;
+    --book-page-btn-height: 2.5em;
+    --book-page-btn-width:  3em;
+
+    --book-title-height: calc(var(--book-title-fontsize) * var(--txt-lineheight) * var(--book-title-rows)
+                            + 2 * var(--book-box-padding));
+    --book-author-height: calc(var(--book-author-fontsize) * var(--txt-lineheight) + var(--book-author-bottom-padding));
+    --book-property-height: calc((var(--book-data-lbl-fontsize) + var(--book-data-fontsize)) * var(--txt-lineheight));
+    --book-data-height: calc(2 * var(--book-box-padding) + var(--book-property-height) + var(--book-box-data-gap-ver) 
+                        + max(var(--book-property-height) + var(--book-page-btn-height) + var(--book-box-data-gap-ver),var(--book-state-height)));
+    --book-footer-height: calc(max(var(--book-addedon-fontsize),var(--book-addedon-var-fontsize)) * var(--txt-lineheight)
+                        + 2 * var(--book-box-padding));
+
+    /* --book-box-height: min-content; */
+    --book-box-height: calc(var(--book-title-height) + var(--book-author-height) + var(--book-data-height) + var(--book-footer-height));
 
     /* Radius */
     --radius:           10px;
 
     /* Shadows */
-    --outset-shadow: 2px 2px 3px var(--col-grey);
-    --outset-shadow-dark: 1px 1px 5px var(--col-black);
+    --outset-shadow-center: 0px 0px 3px var(--col-black);
+    --outset-shadow-below: 0px 1px 5px var(--col-black);
+    --outset-shadow-top: 0px -1px 2px var(--col-black);
+    --title-txt-shadow: var(--col-purewhite) 0px 0px 3px;
+    --author-txt-shadow: var(--col-black) 0px 0px 3px;
 
     /* Animations on hover / active / ...*/
     --transition-time: 0.8s;
@@ -281,10 +300,10 @@ button.btn-highlight .icon::before{
 
 header{
     background-color: var(--hdr-bg-col);
-    box-shadow: var(--outset-shadow-dark);
+    box-shadow: var(--outset-shadow-below);
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 10;
 }
 
 .header-container{
@@ -349,11 +368,10 @@ main{
     height: var(--book-box-height);
     min-height: var(--book-box-height);
     max-height: var(--book-box-height);
-    overflow: hidden;
 
     background-color: var(--book-itm-bg-col);
     border-radius: var(--radius);
-    box-shadow: var(--outset-shadow);
+    box-shadow: var(--outset-shadow-center);
 
     display: grid;
     grid-template-rows: min-content min-content min-content min-content min-content;
@@ -366,7 +384,14 @@ main{
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    background-image: url('https://picsum.photos/400/600?random=1');
+
+    /* remove this: apparently, using mask: linear-gradient(...) and backdrop-filter: blur(...)  to dissolve the blur, */
+    /* eg, in .book-header-section, does not work properly when there is overflow: hidden in a container */
+    /* by removing the following overflow hidden the expected behaviour happens */
+    /* This introduce non-rounded corners in the footer of the box, caused by the data section which is pushed down */
+    /* This is fixed later in the style for .book-footer-section, as it only involves that part */
+    /* see https://stackoverflow.com/questions/76921302/backdrop-filter-in-combination-with-mask-image-doesnt-work-as-expected-on-chrom */
+    /* overflow: hidden; */ 
 }
 
 /* Book box - generic section */
@@ -382,18 +407,44 @@ main{
 
 /* Book box - title and author section */
 
+/* see https://stackoverflow.com/questions/57700730/how-to-fade-edges-of-backdrop-filter-blur*/
+.book-header-section {
+    position: relative;
+    z-index: 1;
+}
+
+.book-header-section *{
+    z-index: 2;
+}
+
+.book-header-section::after {
+    content: "";
+    position: absolute;
+    --book-header-padding: 0px; /*calc(var(--book-box-padding)/2);*/
+    inset: var(--book-header-padding) var(--book-header-padding) var(--book-header-padding) var(--book-header-padding);
+    z-index: -1;
+
+    /* border: 2px solid var(--bg-col);
+    border-bottom: none; */
+    background-image: linear-gradient(180deg, var(--col-black), var(--book-data-bg-col) 70%, var(--col-transparent));
+    border-radius: var(--radius) var(--radius) 0  0;
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    mask: linear-gradient(#000 60%, #0000 100%);
+    -webkit-mask: linear-gradient(#000 60%, #0000 100%);
+}
+
 .book-title-section{
     grid-area: title;
     font-size: var(--book-title-fontsize);
     text-align: center;
     font-variant: small-caps;
-    color: var(--book-title-col);
-    background-color: var(--book-author-bg-col);
     text-wrap: balance;
 
-    min-height: var(--boook-title-height);
-    max-height: var(--boook-title-height); 
-    height: var(--boook-title-height);
+    min-height: var(--book-title-height);
+    max-height: var(--book-title-height); 
+    height: var(--book-title-height);
     width: 100%;
 }
 
@@ -404,21 +455,28 @@ main{
     display: flex;
     align-items: center;
     justify-content: center;
-    text-shadow: 1.5px 1px 3px var(--col-white);
+    padding: 3px;
+    
+    border-radius: var(--radius);
+    background-color: var(--book-title-bg-col);
+    color: var(--book-title-col);
+    text-shadow: var(--title-txt-shadow);
+    box-shadow: var(--outset-shadow-center);
 }
 
 .book-author-section{   
     grid-area: author;
     padding-top: 0px;
-    padding-bottom: 0px;
+    padding-bottom: var(--book-author-bottom-padding);
     font-size: var(--book-author-fontsize);
     text-align: right;
-    color: var(--book-author-col);
-    background-color: var(--book-author-bg-col);
+    color: var(--book-author-col-secondary);
+    text-shadow: var(--author-txt-shadow);
 }
 
 .book-author-section .book-author .var-author{
     font-weight: bold;
+    color: var(--book-author-col);
 }
 
 /* Book box - image section */
@@ -436,20 +494,23 @@ main{
 .book-data-section{
     grid-area: data;
     height: 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
+    padding: 0px var(--book-box-padding) 0px;
     overflow: hidden;
     background-image: linear-gradient(180deg, var(--book-data-bg-col), var(--col-transparent));
 
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
     grid-template-areas:
-        "genre year"
-        "pages  state";
+        "genre      year"
+        "pages      state"
+        "pagesBtns  state";
     align-items: end;
     justify-items: center;
     text-align: center;
     gap: var(--book-box-data-gap);
+
+    border-radius: var(--radius) var(--radius) 0 0;
+    box-shadow: var(--outset-shadow-top);
 }
 
 .book-data{
@@ -466,7 +527,6 @@ main{
     font-weight: bold;
     font-size: var(--book-data-fontsize);
     color: var(--book-data-col);
-     /* text-shadow: 2px 2px 2px var(--col-black);  */
 }
 
 .book-genre{
@@ -491,7 +551,8 @@ main{
     text-transform: full-width;
 }
 
-.book-pages .pages-lbl-with-buttons{
+.book-pages-btns{
+    grid-area: pagesBtns;
     display:flex;
     flex-direction: row;
     align-items: center;
@@ -499,20 +560,27 @@ main{
     gap: var(--book-pages-btns-gap);
 }
 
-.book-pages button{
+.book-pages-btns button{
     height: var(--book-page-btn-height);
     width: var(--book-page-btn-width);
-    color: var(--book-data-alt-col);
+    color: var(--book-page-btn-col);
     font-size: var(--book-page-btn-fontsize);
     font-weight: bold;
-    background-color: var(--book-data-bg-col);
-    border: 1px solid var(--book-data-lbl-col);
+    background-color: var(--book-page-btn-bg-col);
+    border: none;
+    box-shadow: 0px 0px 3px var(--col-white);
     outline: none;
     border-radius: var(--radius);
     vertical-align: middle;
     display:inline-flex;
     align-items: center;
     justify-content: center;
+}
+.book-pages-btns button:first-child{
+    border-radius: var(--radius) 0 0 var(--radius);
+}
+.book-pages-btns button:last-child{
+    border-radius: 0 var(--radius) var(--radius) 0;
 }
 
 /* Book box - data section (state) */
@@ -521,6 +589,7 @@ main{
     grid-area: state;
     display: flex;
     align-items: center;
+    align-self: center;
 }
 
 .book-state svg {
@@ -550,6 +619,9 @@ main{
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+    /*fix for the problem reported in the style of .book-box*/
+    overflow: hidden;
+    border-radius: 0 0 var(--radius) var(--radius);
 }
 
 .book-footer-section .book-icons{
@@ -579,16 +651,6 @@ main{
 
 /* || Book box: hover */
 
-.book-box:hover .book-title-section{
-    background-color: var(--book-title-bg-col-hover);
-    color: var(--book-title-col-hover);
-}
-
-.book-box:hover .book-author-section{
-    background-color: var(--book-author-bg-col-hover);
-    color: var(--book-title-col-hover);
-}
-
 .book-box:hover .book-image-section{
     height: 0;
 }
@@ -603,26 +665,21 @@ main{
     background-color: var(--book-data-bg-col);
 }
 
-.book-box:hover .book-state svg circle:nth-child(2){
-    stroke: var(--book-highlight-col);;
-}
-
 .book-box:hover .book-addedon{
     visibility: visible;
     opacity: 1;
     transition: all var(--transition-time);
 }
 
-
-.book-pages button:hover {
-    color: var(--book-data-col);
+.book-pages-btns button:hover {
+    background-color: var(--book-page-btn-bg-col-hover);
+    color: var(--book-page-btn-col-hover);
 }
 
-.book-pages button:active {
-    background-color: var(--bg-col);
-    color: var(--book-title-col);
+.book-pages-btns button:active {
+    background-color: var(--book-page-btn-bg-col-active);
+    color: var(--book-page-btn-col-active);
 }
-
 
 /* || Dialog boxes */
 
@@ -631,7 +688,7 @@ dialog{
     color: var(--dialog-col);
     background-color: var(--dialog-bg-col);
     border: var(--dialog-border-width) solid var(--dialog-border-col); 
-    box-shadow: var(--outset-shadow-dark);
+    box-shadow: var(--outset-shadow-center);
     font-size: var(--dialog-fontsize);
                 
     /*center it in the page*/
