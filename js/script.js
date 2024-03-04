@@ -415,7 +415,7 @@ function createstateSvg(){
 
     stateSvg.setAttribute('width',     '100%');
     stateSvg.setAttribute('height',    '100%');
-    stateSvg.setAttribute('viewBox',   '-44.035 -40 199.035 195');
+    stateSvg.setAttribute('viewBox',   '-60.006 -58.741 215.006 232.483'); /* '-44.035 -40 199.035 195' */
     stateSvg.setAttribute('version',   '1.1');
     stateSvg.setAttribute('style',     'transform:rotate(-90deg)');
 
@@ -451,7 +451,8 @@ function createstateSvg(){
     /* Circular text */
     let circularText = document.createElementNS(svgNS, 'text');
     circularText.setAttribute('width','50');
-
+    circularText.setAttribute('dy','5%');
+    
     let circularTextPath = document.createElementNS(svgNS, 'textPath');
     circularTextPath.setAttribute('href','#curve');
     circularTextPath.setAttribute('startOffset','50%');

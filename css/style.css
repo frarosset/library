@@ -84,7 +84,7 @@
     --book-data-fontsize:       1.5rem;
     --book-data-lbl-fontsize:   1rem;
     --book-pages-read-fontsize: 0.7em;
-    --book-state-fontsize:     2.6rem;
+    --book-state-fontsize:      30px;
     --book-addedon-fontsize:    0.8rem;
     --book-addedon-var-fontsize: 0.9rem;
     --book-page-btn-fontsize:   1rem;
@@ -132,7 +132,8 @@
     --book-box-data-gap:     var(--book-box-data-gap-ver) var(--book-box-data-gap-hor);
     --book-author-bottom-padding: var(--book-box-padding);
 
-    --book-state-height:   60px;
+    --book-state-height:    80px;
+    --book-state-height:    calc(var(--book-property-height) + var(--book-page-btn-height) + var(--book-box-data-gap-ver));
     --book-pages-btns-gap:  0px;
     --book-footer-icon-gap: 3px;
     --book-footer-icon-len: 6px;
@@ -142,15 +143,15 @@
 
     --book-title-height: calc(var(--book-title-fontsize) * var(--txt-lineheight) * var(--book-title-rows)
                             + 2 * var(--book-box-padding));
-    --book-author-height: calc(var(--book-author-fontsize) * var(--txt-lineheight) + var(--book-author-bottom-padding));
+    /* --book-author-height: calc(var(--book-author-fontsize) * var(--txt-lineheight) + var(--book-author-bottom-padding)); */
     --book-property-height: calc((var(--book-data-lbl-fontsize) + var(--book-data-fontsize)) * var(--txt-lineheight));
     --book-data-height: calc(2 * var(--book-box-padding) + var(--book-property-height) + var(--book-box-data-gap-ver) 
                         + max(var(--book-property-height) + var(--book-page-btn-height) + var(--book-box-data-gap-ver),var(--book-state-height)));
-    --book-footer-height: calc(max(var(--book-addedon-fontsize),var(--book-addedon-var-fontsize)) * var(--txt-lineheight)
-                        + 2 * var(--book-box-padding));
+    /* --book-footer-height: calc(max(var(--book-addedon-fontsize),var(--book-addedon-var-fontsize)) * var(--txt-lineheight)
+                        + 2 * var(--book-box-padding)); */
 
-    /* --book-box-height: min-content; */
-    --book-box-height: calc(var(--book-title-height) + var(--book-author-height) + var(--book-data-height) + var(--book-footer-height));
+    --book-box-height: min-content;
+    /* --book-box-height: calc(var(--book-title-height) + var(--book-author-height) + var(--book-data-height) + var(--book-footer-height)); */
 
     /* Radius */
     --radius:           10px;
@@ -595,7 +596,6 @@ main{
 .book-state svg {
     width: auto;
     height: var(--book-state-height);
-    font-size: var(--book-state-fontsize);
 }
 
 .book-state svg circle:first-child{
@@ -609,6 +609,7 @@ main{
 .book-state svg textPath{
     fill: var(--book-data-alt-col);
     font-variant: small-caps;
+    font-size: var(--book-state-fontsize);
 }
 
 /* Book box - footer section */
