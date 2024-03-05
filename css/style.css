@@ -52,6 +52,7 @@
     --book-highlight-col:       var(--col-accent-dark);
     --book-addedon-lbl-col:     var(--book-data-lbl-col);
     --book-addedon-col:         var(--col-purewhite);
+    --book-footer-icon-col:     var(--col-purewhite);
 
     --book-page-btn-col:             var(--book-data-alt-col);
     --book-page-btn-col-hover:       var(--book-data-alt-col);
@@ -127,7 +128,7 @@
     --book-title-rows: 2;
 
     --book-box-padding:      10px;
-    --book-box-data-gap-ver: 10px;
+    --book-box-data-gap-ver: 15px;
     --book-box-data-gap-hor: 10px;
     --book-box-data-gap:     var(--book-box-data-gap-ver) var(--book-box-data-gap-hor);
     --book-author-bottom-padding: var(--book-box-padding);
@@ -135,23 +136,23 @@
     --book-state-height:    80px;
     --book-state-height:    calc(var(--book-property-height) + var(--book-page-btn-height) + var(--book-box-data-gap-ver));
     --book-pages-btns-gap:  0px;
-    --book-footer-icon-gap: 3px;
-    --book-footer-icon-len: 6px;
+    --book-footer-icon-gap: 0.4rem;
+    --book-footer-icon-len: 2rem;
 
-    --book-page-btn-height: 2.5em;
+    --book-page-btn-height: 2em;
     --book-page-btn-width:  3em;
 
     --book-title-height: calc(var(--book-title-fontsize) * var(--txt-lineheight) * var(--book-title-rows)
                             + 2 * var(--book-box-padding));
-    /* --book-author-height: calc(var(--book-author-fontsize) * var(--txt-lineheight) + var(--book-author-bottom-padding)); */
+    --book-author-height: calc(var(--book-author-fontsize) * var(--txt-lineheight) + var(--book-author-bottom-padding));
     --book-property-height: calc((var(--book-data-lbl-fontsize) + var(--book-data-fontsize)) * var(--txt-lineheight));
     --book-data-height: calc(2 * var(--book-box-padding) + var(--book-property-height) + var(--book-box-data-gap-ver) 
                         + max(var(--book-property-height) + var(--book-page-btn-height) + var(--book-box-data-gap-ver),var(--book-state-height)));
-    /* --book-footer-height: calc(max(var(--book-addedon-fontsize),var(--book-addedon-var-fontsize)) * var(--txt-lineheight)
-                        + 2 * var(--book-box-padding)); */
+    --book-footer-height: calc(max(max(var(--book-addedon-fontsize),var(--book-addedon-var-fontsize)) * var(--txt-lineheight), var(--book-footer-icon-len))
+                        + 2 * var(--book-box-padding));
 
     --book-box-height: min-content;
-    /* --book-box-height: calc(var(--book-title-height) + var(--book-author-height) + var(--book-data-height) + var(--book-footer-height)); */
+    --book-box-height: calc(var(--book-title-height) + var(--book-author-height) + var(--book-data-height) + var(--book-footer-height));
 
     /* Radius */
     --radius:           10px;
@@ -193,6 +194,17 @@ html {
     padding: 0;
     margin: 0;
     vertical-align: baseline;
+}
+
+ul{
+    list-style: none;    
+}
+
+a,
+a:hover,
+a:active,
+a:visited{
+    text-decoration: none;
 }
 
 body {
@@ -630,11 +642,27 @@ main{
     align-items: flex-end;
     gap: var(--book-footer-icon-gap);
     color: var(--book-addedon-col);
-    /*TODO: icon lengths ------------------------------------------------------------------ */
+    font-size: 0;
 }
 
-.book-box.favourite .book-icons .like{  /* TODO: add toggle class ------------------------------ */
-    color: var(--book-highlight-col);
+.book-footer-section .book-icons div::before{
+    display: inline-block;
+    content:"";
+    width: var(--book-footer-icon-len); 
+    height: var(--book-footer-icon-len); 
+    background-size: var(--book-footer-icon-len) var(--book-footer-icon-len);
+    background-color: var(--book-footer-icon-col);
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+}
+
+.book-box.favourite .book-footer-section .book-icons div.like::before{
+    background-color: var(--book-highlight-col);
+}
+
+.book-footer-section .book-icons div:not(.like)::before{
+    visibility: hidden;
 }
 
 .book-addedon{
@@ -643,6 +671,7 @@ main{
     visibility: hidden;
     opacity: 0;
     transition: all var(--transition-time);
+    text-align: right;
 }
 
 .book-addedon .var-addedon{
@@ -680,6 +709,10 @@ main{
 .book-pages-btns button:active {
     background-color: var(--book-page-btn-bg-col-active);
     color: var(--book-page-btn-col-active);
+}
+
+.book-box:hover .book-footer-section .book-icons div:not(.like)::before{
+    visibility: visible;
 }
 
 /* || Dialog boxes */
@@ -898,6 +931,21 @@ form #new-book-state-fieldset input:checked+label{
     mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>delete-sweep-outline</title><path d="M15,16H19V18H15V16M15,8H22V10H15V8M15,12H21V14H15V12M11,10V18H5V10H11M13,8H3V18A2,2 0 0,0 5,20H11A2,2 0 0,0 13,18V8M14,5H11L10,4H6L5,5H2V7H14V5Z" /></svg>');
 }
 
+.book-footer-section .book-icons div.like::before{
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>heart-outline</title><path d="M12.1,18.55L12,18.65L11.89,18.55C7.14,14.24 4,11.39 4,8.5C4,6.5 5.5,5 7.5,5C9.04,5 10.54,6 11.07,7.36H12.93C13.46,6 14.96,5 16.5,5C18.5,5 20,6.5 20,8.5C20,11.39 16.86,14.24 12.1,18.55M16.5,3C14.76,3 13.09,3.81 12,5.08C10.91,3.81 9.24,3 7.5,3C4.42,3 2,5.41 2,8.5C2,12.27 5.4,15.36 10.55,20.03L12,21.35L13.45,20.03C18.6,15.36 22,12.27 22,8.5C22,5.41 19.58,3 16.5,3Z" /></svg>');
+}
+
+.book-box.favourite .book-footer-section .book-icons div.like::before{
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>heart</title><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg>');
+}
+
+.book-footer-section .book-icons div.share::before{
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>share-variant-outline</title><path d="M18 16.08C17.24 16.08 16.56 16.38 16.04 16.85L8.91 12.7C8.96 12.47 9 12.24 9 12S8.96 11.53 8.91 11.3L15.96 7.19C16.5 7.69 17.21 8 18 8C19.66 8 21 6.66 21 5S19.66 2 18 2 15 3.34 15 5C15 5.24 15.04 5.47 15.09 5.7L8.04 9.81C7.5 9.31 6.79 9 6 9C4.34 9 3 10.34 3 12S4.34 15 6 15C6.79 15 7.5 14.69 8.04 14.19L15.16 18.34C15.11 18.55 15.08 18.77 15.08 19C15.08 20.61 16.39 21.91 18 21.91S20.92 20.61 20.92 19C20.92 17.39 19.61 16.08 18 16.08M18 4C18.55 4 19 4.45 19 5S18.55 6 18 6 17 5.55 17 5 17.45 4 18 4M6 13C5.45 13 5 12.55 5 12S5.45 11 6 11 7 11.45 7 12 6.55 13 6 13M18 20C17.45 20 17 19.55 17 19S17.45 18 18 18 19 18.45 19 19 18.55 20 18 20Z" /></svg>');
+}
+
+.book-footer-section .book-icons div.del::before{
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>delete-outline</title><path d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg>');
+}
 
 
 /* || Footer */

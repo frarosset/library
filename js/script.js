@@ -47,6 +47,7 @@ function Book(state, title, author, pages, genre='-', year='-', pagesRead = 0) {
     this.pages = pages;
     this.pagesRead = pagesRead;
     this.state = state;
+    this.favourite = false;
 
     currentId++;
     this.id = currentId;
@@ -190,11 +191,11 @@ Library.prototype.addBook = function (book) {
                     </div>
                 </div>
                 <div class="book-section book-footer-section">  
-                    <div class="book-icons">
-                        <div class="icon like">❤</div>
-                        <div class="icon share">❤</div>
-                        <div class="icon del">❤</div>
-                    </div>
+                    <ul class="book-icons">
+                        <li><div class="icon like">❤</div></li>
+                        <li><a href="#" class="icon share">❤</a></li>
+                        <li><div class="icon del">❤</div></li>
+                    </ul>
                     <div class="book-addedon">inserted on <span class="var-data var-addedon">10/2/2024</span></div>
                 </div>
             </div>
@@ -344,22 +345,39 @@ function createNewBookBox(newBook){
     bookFooterSection.classList.add('book-section','book-footer-section');
 
     /* icons */
-    let bookIconsSection_div = document.createElement('div');
-    bookIconsSection_div.classList.add('book-icons');
-    bookIconsSection_div.textContent = '';
+    let bookIconsSection_ul = document.createElement('ul');
+    bookIconsSection_ul.classList.add('book-icons');
+    bookIconsSection_ul.textContent = '';
 
     let iconsClass = ['like','share','del'];
-    let iconsContent = ['❤','❤','❤']; /* temporary */
+    let iconsType = ['div','a','div'];
+    let iconsContent = ['like','share','del']; /* temporary */
+    let likeToggle;
 
     for (let i=0; i<iconsClass.length; i++){
-        let bookIconsSection_div_icon = document.createElement('div');
-        bookIconsSection_div_icon.classList.add('icon',iconsClass[i]);
-        bookIconsSection_div_icon.textContent = iconsContent[i];
+        let bookIconsSection_li = document.createElement('li');
         
-        bookIconsSection_div.appendChild(bookIconsSection_div_icon);
+        let bookIconsSection_li_icon = document.createElement('div');
+        bookIconsSection_li_icon.classList.add('icon',iconsClass[i]);
+        bookIconsSection_li_icon.textContent = iconsContent[i];
+
+        if (iconsType[i]=='a'){
+            let bookIconsSection_li_icon_a = document.createElement('a');
+            bookIconsSection_li_icon_a.setAttribute('href','#');
+            bookIconsSection_li_icon_a.appendChild(bookIconsSection_li_icon);
+            bookIconsSection_li.appendChild(bookIconsSection_li_icon_a);
+        } else {
+            bookIconsSection_li.appendChild(bookIconsSection_li_icon);
+        }
+
+        if (iconsClass[i]=='like'){
+            likeToggle = bookIconsSection_li_icon;
+        }
+
+        bookIconsSection_ul.appendChild(bookIconsSection_li);
     }
 
-    bookFooterSection.appendChild(bookIconsSection_div);
+    bookFooterSection.appendChild(bookIconsSection_ul);
 
     /* addedon */
     let bookAddedonSection_div = document.createElement('div');
@@ -380,6 +398,10 @@ function createNewBookBox(newBook){
     bookBox.readPagesDiv = bookPagesSection_div_var_read;
     bookBox.bookstateSvg = bookstateSvg;
 
+    bookPagesSection_div_btn1.bookBoxDiv = bookBox;
+    bookPagesSection_div_btn2.bookBoxDiv = bookBox;
+    likeToggle.bookBoxDiv = bookBox;    
+
     //bookPagesSection_div_btn1.addEventListener('click',decreaseReadPages_callback);
     // bookPagesSection_div_btn2.addEventListener('click',increaseReadPages_callback);
 
@@ -391,10 +413,7 @@ function createNewBookBox(newBook){
     bookPagesSection_div_btn2.addEventListener('pointerup',stopChangeReadPages_callback);
     bookPagesSection_div_btn2.addEventListener('pointerout',stopChangeReadPages_callback);
 
-
-
-    bookPagesSection_div_btn1.bookBoxDiv = bookBox;
-    bookPagesSection_div_btn2.bookBoxDiv = bookBox;
+    likeToggle.addEventListener('click',likeToggle_callback);    
     
     /* return the new book box*/
     return bookBox;
@@ -594,6 +613,12 @@ function stopChangeReadPages_callback(e){
     clearInterval(btn.interval);
 }
 
+function likeToggle_callback(e){
+    let elem = e.target;
+    let thisBook = elem.bookBoxDiv.book;
+    elem.bookBoxDiv.book.favourite = elem.bookBoxDiv.classList.toggle('favourite');
+}
+
 function adaptBookTitlesSizeResize_callback(){
     // wait some time before calling the actual resize function,
     // to avoid calling it multiple times
@@ -621,8 +646,6 @@ function initLibrary(library,numOfBooks){ // library is an object, passed by ref
         updateBookInfo(bookBox,book);
         booksContainer.appendChild(bookBox);
     }
-
-    adaptBookTitlesSize();
 
     let newBookBtn = document.querySelector(".header-container button.new-book");
     let newBookDialog = document.querySelector("#dialog-new-book");
@@ -657,6 +680,8 @@ function initLibrary(library,numOfBooks){ // library is an object, passed by ref
     clearAllYesBtn.addEventListener('click',clearAll_callback);
 
     window.addEventListener('resize',adaptBookTitlesSizeResize_callback);
+
+    adaptBookTitlesSize();
 }
 
 /* Some sample data --------------------------------------- */
