@@ -292,7 +292,13 @@ button:focus-visible{
     outline: var(--btn-focus-width) solid var(--btn-focus-col);
     outline-offset: var(--btn-focus-offset);
 }
- 
+
+button .icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 button .icon::before{
     display: inline-block;
     content:"";
@@ -925,6 +931,77 @@ fieldset input:checked+label{
 
 }
 
+/* || Display settings */
+:root{
+    --display-settings-padding-bottom:  30px;
+
+    --display-settings-label-fontsize:  1rem;
+    --display-settings-fontsize:        1.2rem;
+    --display-settings-line-color:      var(--col-grey);
+
+    --display-settings-input-height:    max(2.2rem, calc(var(--display-settings-fontsize) * var(--txt-lineheight) + 1px)); /*1px: border bottom of input*/
+   
+    --display-settings-btn-width:       2.5rem;
+    --display-settings-btn-gap:         0px;
+    --display-settings-btn-icon-len:    var(--display-settings-input-height);
+    --display-settings-btn-fontsize:    var(--display-settings-label-fontsiz);
+    --display-settings-btn-border-width:0px;
+    --display-setting-orderby-gap:      0.5rem;
+
+}
+
+.display-settings{
+    padding-bottom: var(--display-settings-padding-bottom);
+}
+
+.display-settings label{
+    font-size: var(--display-settings-label-fontsize);
+    font-variant: small-caps;
+    font-weight: bold;
+}
+
+.display-setting input,
+.display-setting select{
+    font-size: var(--display-settings-fontsize);
+    border: none;
+    outline: none;
+    border-bottom: 1px solid var(--display-settings-line-color);
+    height: var(--display-settings-input-height);
+}
+
+#display-setting-orderby-div{
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-template-areas:
+        "label-orderby  label-order"
+        "select-orderby button-order";
+    gap: var(--display-setting-orderby-gap);
+}
+
+#display-setting-orderby>label{
+    grid-area: label-orderby;
+}
+#display-setting-orderby-descend-btn>label{
+    grid-area: label-order;
+}
+#display-setting-orderby{
+    grid-area: select-orderby;
+}
+#display-setting-orderby-descend-btn{
+    --btn-height: var(--display-settings-input-height);
+    --btn-width: var(--display-settings-btn-width);
+    --btn-gap: var(--display-settings-btn-gap);
+    --btn-icon-len: var(--display-settings-input-height);
+    --btn-fontsize: var(--display-settings-btn-fontsize);
+    --btn-border-width: var(--display-settings-btn-border-width);
+    grid-area: button-order;
+    align-self: end;
+    border-radius: 0;
+    background-color: transparent;
+}
+
+
+
 
 /* || Icons sources */
 /* from: https://pictogrammers.com/library/mdi/ */
@@ -951,6 +1028,14 @@ fieldset input:checked+label{
 
 .book-footer-section .book-icons div.del::before{
     mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>delete-outline</title><path d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg>');
+}
+
+.display-settings div.orderby-descend::before{
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>sort-ascending</title><path d="M19 17H22L18 21L14 17H17V3H19M2 17H12V19H2M6 5V7H2V5M2 11H9V13H2V11Z" /></svg>');
+}
+
+.display-settings #display-setting-orderby-descend-btn.descend div.orderby-descend::before{
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>sort-descending</title><path d="M19 7H22L18 3L14 7H17V21H19M2 17H12V19H2M6 5V7H2V5M2 11H9V13H2V11Z" /></svg>');
 }
 
 

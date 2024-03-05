@@ -1,6 +1,7 @@
 let currentId = 0; // Global variable
 let InitialNumOfBooks = 25;
 
+let simplifiedStatesOfRead = ['not read yet', 'reading','read'];
 let statesOfRead = ['not read yet', 'just started', 'halfway through', 'almost finished','read'];
 
 /* Generic function --------------------------------------- */
@@ -39,14 +40,13 @@ function checkOverflow(el)
 
 /* Book Constructor --------------------------------------- */
 
-function Book(state, title, author, pages, genre='-', year='-', pagesRead = 0) {
+function Book(pagesRead, title, author, pages, genre='-', year='-') {
     this.title = title;
     this.author = author;
     this.genre = genre;
     this.year = year;
     this.pages = pages;
     this.pagesRead = pagesRead;
-    this.state = state;
     this.favourite = false;
 
     currentId++;
@@ -60,7 +60,11 @@ function Book(state, title, author, pages, genre='-', year='-', pagesRead = 0) {
 }
 
 Book.prototype.stateFormatted = function () {
-    return statesOfRead[this.state];
+    return statesOfRead[this.stateId];
+};
+
+Book.prototype.simplifiedStateFormatted = function () {
+    return simplifiedStatesOfRead[this.simplifiedStateId];
 };
 
 Book.prototype.addedOnFormatted = function () {
@@ -114,17 +118,21 @@ Book.prototype.decrementReadPages = function (n=1) {
 Book.prototype.updateState = function () {
     if (this.pagesRead == 0){
         this.progress = 0;
-        this.state = statesOfRead[0];
+        this.stateId = 0;
+        this.simplifiedStateId = 0;
     } else if (this.pagesRead == this.pages){
         this.progress = 1;
-        this.state = statesOfRead[statesOfRead.length-1];
+        this.stateId = statesOfRead.length-1;
+        this.simplifiedStateId = 2;
     } else if (this.pagesRead > 0 && this.pagesRead < this.pages){
         this.progress = this.pagesRead / this.pages;
         let N = statesOfRead.length;
         let interval = 1/(N-2);
-        let stateIndex = Math.floor(this.progress/interval);
-        this.state = statesOfRead[stateIndex+1];
+        this.stateId = Math.floor(this.progress/interval) + 1;
+        this.simplifiedStateId = 1;
     }
+    this.state = statesOfRead[this.stateId];
+    this.simplifiedState = simplifiedStatesOfRead[this.simplifiedStateId];
 }
 
 Book.prototype.setBookBoxDiv = function (bookBoxDiv) {
@@ -163,7 +171,6 @@ Library.prototype.deleteBook = function (book) {
         this.books.splice(index, 1);
     }
 }
-
 
 // eg, properties to sort: title, author, genre, year, pages, pagesRead, id[addedOn], progress
 Library.prototype.sortBy = function (property, descend = false) {
@@ -681,8 +688,6 @@ function fitFontSize(elem, defaultFontSize='',delta=0.9){
     }
 }
 
-/* bookBox -> .favourite is optional */
-
 /* Buttons callbacks */
 function showModal_callback(e){
     e.target.associatedModal.showModal();
@@ -782,16 +787,39 @@ function adaptBookTitlesSizeResize_callback(){
     }, 200);
 }
 
+/* Display settings */
+function sortBooks(){
+    // to be called when:
+    //  - the method of sorting changes
+    //  - a new book is added (todo)
+    myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend)
+}
+
+function displaySettingOrderby_callback(e){
+    displaySettings.orderBy = e.target.value;
+    sortBooks();
+}
+
+function displaySettingOrderByDescend_callback(e){
+    displaySettings.orderByDescend = e.target.classList.toggle('descend');
+    sortBooks();
+}
+
+
+
 
 /* Get template data --------------------------------------- */
 
-function initLibrary(library,numOfBooks){ // library is an object, passed by reference
+function initRandomLibrary(library,numOfBooks){ // library is an object, passed by reference
     currentId = -1;
 
     for (let i=0; i<numOfBooks; i++){
         let bookData = sampleBooks[i];
-        let state =  randomInt(0,statesOfRead.length-1);
-        let book = new Book(state,...bookData);
+        /* generate a random simplified state: 'not read yet' or 'reading' or 'read' */
+        /* if the state is reading, generate a more specific state by generating a random nmber of pages read */
+        let simplifiedState =  randomInt(0,2);
+        let pagesRead =  simplifiedState==0? 0 : simplifiedState==1? randomInt(1,bookData[2]-1) : bookData[2];
+        let book = new Book(pagesRead,...bookData);
         library.addBook(book);
 
         /* Add it to the DOM */
@@ -800,7 +828,9 @@ function initLibrary(library,numOfBooks){ // library is an object, passed by ref
         updateBookInfo(bookBox,book);
         booksContainer.appendChild(bookBox);
     }
+}
 
+function initInterface(){ 
     let newBookBtn = document.querySelector(".header-container button.new-book");
     let newBookDialog = document.querySelector("#dialog-new-book");
 
@@ -849,6 +879,18 @@ function initLibrary(library,numOfBooks){ // library is an object, passed by ref
 
     /* Re-fit book titles sizes when resizing the window */
     window.addEventListener('resize',adaptBookTitlesSizeResize_callback);
+
+    /* Display settings */
+    let displaySettingOrderby = document.querySelector("#display-setting-orderby");
+    displaySettings.orderBy = displaySettingOrderby.value; /* init */
+    displaySettingOrderby.addEventListener('change', displaySettingOrderby_callback);
+    
+    let displaySettingOrderByDescend = document.querySelector("#display-setting-orderby-descend-btn");
+    displaySettings.orderByDescend = displaySettingOrderByDescend.classList.contains('descend'); /* init */
+    displaySettingOrderByDescend.addEventListener('click', displaySettingOrderByDescend_callback);
+    
+
+    
 
     adaptBookTitlesSize();
 }
@@ -906,7 +948,9 @@ const sampleBooks = [
 
 /* Initialization + Testing code */
 let booksContainer = document.querySelector(".books-container");
+let displaySettings = {};
 
 let myLibrary = new Library();
-initLibrary(myLibrary,InitialNumOfBooks);
+initRandomLibrary(myLibrary,InitialNumOfBooks);
+initInterface();
 myLibrary.printInfo();

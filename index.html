@@ -95,7 +95,24 @@
         </div>
     </header>
     <main class="main-container">
-        <div></div>
+        <div class="display-settings">
+            <div id="display-setting-orderby-div" class="display-setting">
+                <select id="display-setting-orderby" name="orderby">
+                    <option value="id" selected disabled>-</option>
+                    <option value="title">Title</option>
+                    <option value="author">Author</option>
+                    <option value="genre">Genre</option>
+                    <option value="year">Year</option>
+                    <option value="pages">Pages</option>
+                    <option value="pagesRead">Read pages</option>
+                    <option value="progress">Progress</option>
+                    <option value="id">Date of insertion</option>
+                </select>
+                <label for="display-setting-orderby">Sort by</label>
+                <button id="display-setting-orderby-descend-btn" type="button"><div class="icon orderby-descend"></div></button>
+                <label for="display-setting-orderby-descend-btn">Order</label>
+            </div>
+        </div>
         <div class="books-container">
         </div>
     </main>
