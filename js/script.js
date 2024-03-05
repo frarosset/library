@@ -235,9 +235,37 @@ Library.prototype.filterBy = function (...attributes) {
     });
 }
 
+Library.prototype.search = function (str,properties=['title','author']) {
+    if (this.books.length==0)
+        return;
 
+    str = str.toLowerCase();
 
+    if (properties.length==undefined || properties.length==0)
+        properties = Object.keys(myLibrary.books[0]);
 
+    // init the show status
+    this.books.map(itm => itm.matched = false);
+
+    properties.map(prop =>{        
+        if (!prop in this.books[0])
+            return;
+        this.books.map(itm => {
+            if (!itm.matched && itm[prop].toString().toLowerCase().includes(str))
+                itm.matched = true;
+        });
+    });
+
+    console.table(this.books.filter(itm => itm.matched));
+
+    // Update the displayed order
+    this.books.map((itm) => {
+        if (!itm.matched)
+            itm.bookBoxDiv.classList.add('unmatched');
+        else
+            itm.bookBoxDiv.classList.remove('unmatched');
+    });
+}
 
 
 

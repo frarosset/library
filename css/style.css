@@ -407,7 +407,8 @@ main{
     /* overflow: hidden; */ 
 }
 
-.book-box.hide{
+.book-box.hide,
+.book-box.unmatched{
     display: none;
 }
 
