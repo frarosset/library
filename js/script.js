@@ -197,6 +197,44 @@ Library.prototype.sortBy = function (property, descend = false) {
     this.books.map((itm,idx) => itm.bookBoxDiv.style.order = idx);
 }
 
+function attributeForFilter(property,...values){
+    // use this as attributeForFilter('title','value1','value2')
+    return {property: property, values: values};
+}
+
+Library.prototype.filterBy = function (...attributes) {
+    // attributes: array of {property: 'year', values: [1999,2009]]}: see function attributeForFilter()
+    // this function ASSUMES that each property is reported only once in attributes array
+    if (this.books.length==0)
+        return;
+
+    // The books to show contains all the attributes A,B,C,..: A and B and C ...
+    // Note: to get the items to hide, you would need: not(A) or not(B) or not(C) or ...
+
+    // init the show status
+    this.books.map(itm => itm.show = true);
+
+    attributes.map(attr =>{        
+        if (!attr.property in this.books[0])
+            return;
+
+        this.books.map(itm => {
+            if (itm.show && !attr.values.includes(itm[attr.property]))
+                itm.show = false;
+        });
+    });
+
+    console.table(this.books.filter(itm => itm.show));
+
+    // Update the displayed order
+    this.books.map((itm) => {
+        if (!itm.show)
+            itm.bookBoxDiv.classList.add('hide');
+        else
+            itm.bookBoxDiv.classList.remove('hide');
+    });
+}
+
 
 
 

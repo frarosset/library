@@ -407,6 +407,10 @@ main{
     /* overflow: hidden; */ 
 }
 
+.book-box.hide{
+    display: none;
+}
+
 /* Book box - generic section */
 .book-section{
     padding: var(--book-box-padding);
