@@ -151,6 +151,13 @@ Library.prototype.addBook = function (book) {
     this.books.push(book);
 }
 
+Library.prototype.deleteBook = function (book) {
+    const index = myLibrary.books.indexOf(book);
+    if (index > -1) {
+        myLibrary.books.splice(index, 1);
+    }
+}
+
 /* Book Box (DOM)*/
 /* HTML CODE TO GENERATE:
 <div class="book-box favourite">
@@ -352,7 +359,7 @@ function createNewBookBox(newBook){
     let iconsClass = ['like','share','del'];
     let iconsType = ['div','a','div'];
     let iconsContent = ['like','share','del']; /* temporary */
-    let likeToggle;
+    let likeToggle,deleteThisBook;
 
     for (let i=0; i<iconsClass.length; i++){
         let bookIconsSection_li = document.createElement('li');
@@ -372,6 +379,8 @@ function createNewBookBox(newBook){
 
         if (iconsClass[i]=='like'){
             likeToggle = bookIconsSection_li_icon;
+        } else if (iconsClass[i]=='del'){
+            deleteThisBook = bookIconsSection_li_icon;
         }
 
         bookIconsSection_ul.appendChild(bookIconsSection_li);
@@ -400,7 +409,8 @@ function createNewBookBox(newBook){
 
     bookPagesSection_div_btn1.bookBoxDiv = bookBox;
     bookPagesSection_div_btn2.bookBoxDiv = bookBox;
-    likeToggle.bookBoxDiv = bookBox;    
+    likeToggle.bookBoxDiv = bookBox;  
+    deleteThisBook.bookBoxDiv = bookBox;  
 
     //bookPagesSection_div_btn1.addEventListener('click',decreaseReadPages_callback);
     // bookPagesSection_div_btn2.addEventListener('click',increaseReadPages_callback);
@@ -413,7 +423,8 @@ function createNewBookBox(newBook){
     bookPagesSection_div_btn2.addEventListener('pointerup',stopChangeReadPages_callback);
     bookPagesSection_div_btn2.addEventListener('pointerout',stopChangeReadPages_callback);
 
-    likeToggle.addEventListener('click',likeToggle_callback);    
+    likeToggle.addEventListener('click',likeToggle_callback);
+    deleteThisBook.addEventListener('click',deleteThisBook_callback);   
     
     /* return the new book box*/
     return bookBox;
@@ -568,6 +579,22 @@ function clearAll_callback(e){
 
     // Close the modal
     e.target.associatedModal.close();
+}
+
+function deleteThisBook_callback(e){
+    let thisBookDiv = e.target.bookBoxDiv;
+    let thisBook = e.target.bookBoxDiv.book;
+
+    /* Delete all the childred and the descendants of thisBookDiv,
+       and then, thisBookDiv itself*/
+    removeDescendants(thisBookDiv);
+    thisBookDiv.remove();
+
+    /* Delete thisBook from myLibrary */
+    myLibrary.deleteBook(thisBook);
+
+    // Close the modal /*todo*/
+    // e.target.associatedModal.close();
 }
 
 function increaseReadPages_callback(e){

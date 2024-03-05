@@ -165,7 +165,7 @@
     --author-txt-shadow: var(--col-black) 0px 0px 3px;
 
     /* Animations on hover / active / ...*/
-    --transition-time: 0.8s;
+    --transition-time: 0.3s;
 }
 
 ::backdrop {
