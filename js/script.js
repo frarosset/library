@@ -55,6 +55,8 @@ function Book(state, title, author, pages, genre='-', year='-', pagesRead = 0) {
 
     // Update the state
     this.updateState();
+
+    this.bookBoxDiv = undefined;
 }
 
 Book.prototype.stateFormatted = function () {
@@ -125,6 +127,10 @@ Book.prototype.updateState = function () {
     }
 }
 
+Book.prototype.setBookBoxDiv = function (bookBoxDiv) {
+    this.bookBoxDiv = bookBoxDiv;
+};
+
 /* Library Constructor --------------------------------------- */
 
 function Library() {
@@ -152,11 +158,50 @@ Library.prototype.addBook = function (book) {
 }
 
 Library.prototype.deleteBook = function (book) {
-    const index = myLibrary.books.indexOf(book);
+    const index = this.books.indexOf(book);
     if (index > -1) {
-        myLibrary.books.splice(index, 1);
+        this.books.splice(index, 1);
     }
 }
+
+
+// eg, properties to sort: title, author, genre, year, pages, pagesRead, id[addedOn], progress
+Library.prototype.sortBy = function (property, descend = false) {
+    if (this.books.length==0 || !property in this.books[0])
+        return;
+
+    let sampleItem = this.books[0][property];
+
+    if (typeof sampleItem == 'number')
+        this.books.sort((a,b) => a[property] - b[property]);
+    else if (typeof sampleItem == 'string') // alphabetical order
+        this.books.sort((a,b) => {
+            aStr = a[property].toUpperCase();
+            bStr = b[property].toUpperCase();
+            if (aStr < bStr)
+                return -1;
+            else if (aStr > bStr)
+                return 1;
+            else
+                return 0;
+        });
+    else if (sampleItem instanceof Date)
+        this.books.sort((a,b) => a[property].getTime() - b[property].getTime());    
+
+    if (descend)
+        this.books.reverse();
+
+    console.table(this.books);
+
+    // Update the displayed order
+    this.books.map((itm,idx) => itm.bookBoxDiv.style.order = idx);
+}
+
+
+
+
+
+
 
 /* Book Box (DOM)*/
 /* HTML CODE TO GENERATE:
@@ -685,6 +730,7 @@ function initLibrary(library,numOfBooks){ // library is an object, passed by ref
 
         /* Add it to the DOM */
         let bookBox = createNewBookBox(book);
+        book.setBookBoxDiv(bookBox);
         updateBookInfo(bookBox,book);
         booksContainer.appendChild(bookBox);
     }
