@@ -409,8 +409,6 @@ function createNewBookBox(newBook){
 
     bookPagesSection_div_btn1.bookBoxDiv = bookBox;
     bookPagesSection_div_btn2.bookBoxDiv = bookBox;
-    likeToggle.bookBoxDiv = bookBox;  
-    deleteThisBook.bookBoxDiv = bookBox;  
 
     //bookPagesSection_div_btn1.addEventListener('click',decreaseReadPages_callback);
     // bookPagesSection_div_btn2.addEventListener('click',increaseReadPages_callback);
@@ -423,8 +421,23 @@ function createNewBookBox(newBook){
     bookPagesSection_div_btn2.addEventListener('pointerup',stopChangeReadPages_callback);
     bookPagesSection_div_btn2.addEventListener('pointerout',stopChangeReadPages_callback);
 
+    /* ***** */
+    likeToggle.bookBoxDiv = bookBox;  
     likeToggle.addEventListener('click',likeToggle_callback);
-    deleteThisBook.addEventListener('click',deleteThisBook_callback);   
+
+    /* ***** */
+    /* you must associate  the deleteThisBookDialog to the button you use to delete this
+    specific book. Here the icon deleteThisBook is used. A proper callback is also also specified, 
+    which associates this book to the opened dialog. */
+
+    let deleteThisBookDialog = document.querySelector("#dialog-delete-this-book");
+    let deleteThisBookYesBtn = document.querySelector("#dialog-delete-this-book button.yes");
+
+    deleteThisBook.associatedModal = deleteThisBookDialog;
+    deleteThisBook.addEventListener('click',(e) => {
+        showModal_callback(e); 
+        deleteThisBookYesBtn.bookBoxDiv = bookBox;
+    });  
     
     /* return the new book box*/
     return bookBox;
@@ -585,6 +598,8 @@ function deleteThisBook_callback(e){
     let thisBookDiv = e.target.bookBoxDiv;
     let thisBook = e.target.bookBoxDiv.book;
 
+    console.log(myLibrary)
+
     /* Delete all the childred and the descendants of thisBookDiv,
        and then, thisBookDiv itself*/
     removeDescendants(thisBookDiv);
@@ -593,8 +608,8 @@ function deleteThisBook_callback(e){
     /* Delete thisBook from myLibrary */
     myLibrary.deleteBook(thisBook);
 
-    // Close the modal /*todo*/
-    // e.target.associatedModal.close();
+    // Close the modal
+    e.target.associatedModal.close();
 }
 
 function increaseReadPages_callback(e){
@@ -686,7 +701,7 @@ function initLibrary(library,numOfBooks){ // library is an object, passed by ref
 
     let clearAllCancelBtn = document.querySelector("#dialog-clear-all button.cancel");
     let clearAllYesBtn = document.querySelector("#dialog-clear-all button.yes");
-
+    
     newBookBtn.associatedModal = newBookDialog;
     newBookCancelBtn.associatedModal = newBookDialog;
     newBookSuggestBtn.associatedModal = newBookDialog;
@@ -706,6 +721,21 @@ function initLibrary(library,numOfBooks){ // library is an object, passed by ref
     //newBookAddBtn.addEventListener('click',newBookAdd_callback); /* TODO */  
     clearAllYesBtn.addEventListener('click',clearAll_callback);
 
+    /* dialog for deleteThisBook functionality*/
+    /* Note: you must associate  the deleteThisBookDialog to the button you use to delete a
+       specific book. Here the icon deleteThisBook is used, and this association is done
+       when a new book is added (see createNewBookBox()). A proper callback is also also specified. */
+    let deleteThisBookDialog = document.querySelector("#dialog-delete-this-book");
+    let deleteThisBookCancelBtn = document.querySelector("#dialog-delete-this-book button.cancel");
+    let deleteThisBookYesBtn = document.querySelector("#dialog-delete-this-book button.yes");
+
+    deleteThisBookCancelBtn.associatedModal = deleteThisBookDialog;
+    deleteThisBookYesBtn.associatedModal = deleteThisBookDialog;
+       
+    deleteThisBookCancelBtn.addEventListener('click',closeModal_callback);
+    deleteThisBookYesBtn.addEventListener('click',deleteThisBook_callback);
+
+    /* Re-fit book titles sizes when resizing the window */
     window.addEventListener('resize',adaptBookTitlesSizeResize_callback);
 
     adaptBookTitlesSize();

@@ -137,7 +137,7 @@
     --book-state-height:    calc(var(--book-property-height) + var(--book-page-btn-height) + var(--book-box-data-gap-ver));
     --book-pages-btns-gap:  0px;
     --book-footer-icon-gap: 0.4rem;
-    --book-footer-icon-len: 2rem;
+    --book-footer-icon-len:  min(2rem, 24px);;
 
     --book-page-btn-height: 2em;
     --book-page-btn-width:  3em;
@@ -148,7 +148,7 @@
     --book-property-height: calc((var(--book-data-lbl-fontsize) + var(--book-data-fontsize)) * var(--txt-lineheight));
     --book-data-height: calc(2 * var(--book-box-padding) + var(--book-property-height) + var(--book-box-data-gap-ver) 
                         + max(var(--book-property-height) + var(--book-page-btn-height) + var(--book-box-data-gap-ver),var(--book-state-height)));
-    --book-footer-height: calc(max(max(var(--book-addedon-fontsize),var(--book-addedon-var-fontsize)) * var(--txt-lineheight), var(--book-footer-icon-len))
+    --book-footer-height: calc(max(max(var(--book-addedon-fontsize) + var(--book-addedon-var-fontsize)) * var(--txt-lineheight), var(--book-footer-icon-len))
                         + 2 * var(--book-box-padding));
 
     --book-box-height: min-content;
@@ -635,6 +635,7 @@ main{
     /*fix for the problem reported in the style of .book-box*/
     overflow: hidden;
     border-radius: 0 0 var(--radius) var(--radius);
+    height: var(--book-footer-height);
 }
 
 .book-footer-section .book-icons{
@@ -863,7 +864,7 @@ form>div input:focus+label{
 }
 
 
-form #new-book-state-fieldset{
+fieldset{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -873,11 +874,11 @@ form #new-book-state-fieldset{
     /* align-self: end; */
 }
 
-form #new-book-state-fieldset input{
+fieldset input{
     display: none;
 }
 
-form #new-book-state-fieldset label{
+fieldset label{
     display: flex;
     align-items: center;
     justify-content: center;
@@ -887,7 +888,7 @@ form #new-book-state-fieldset label{
     height: 100%;
 }
 
-form #new-book-state-fieldset input:checked+label{
+fieldset input:checked+label{
     background-color: var(--col-txt);
     color: var(--dialog-bg-col);
     font-size: var(--dialog-fontsize);
