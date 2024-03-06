@@ -96,16 +96,31 @@
     </header>
     <main class="main-container">
         <div class="display-settings">
-
-            <div id="display-setting-filter-favourites-div" class="display-setting">
-                <label for="display-setting-filter-favourites">Filter</label>
-                <fieldset id="display-setting-filter-favourites">
-                    <input type="radio" value="" id="display-setting-filter-favourites-no" name="filter-favourites" checked>
-                    <label for="display-setting-filter-favourites-no">ALL</label>
-                    <input type="radio" value="1" id="display-setting-filter-favourites-yes" name="filter-favourites">
-                    <label for="display-setting-filter-favourites-yes">Favourites</label>
-                </fieldset>
+            <div id="display-setting-filter-div">
+                <div id="display-setting-filter-favourites-div" class="display-setting">
+                    <label for="display-setting-filter-favourites">Show</label>
+                    <fieldset id="display-setting-filter-favourites">
+                        <input type="radio" value="" id="display-setting-filter-favourites-empty" name="filter-favourites" checked>
+                        <label for="display-setting-filter-favourites-empty">all</label>
+                        <input type="radio" value="1" id="display-setting-filter-favourites-yes" name="filter-favourites">
+                        <label for="display-setting-filter-favourites-yes">Favourites</label>
+                    </fieldset>
+                </div>    
+                <div id="display-setting-filter-state-div" class="display-setting">
+                    <label for="display-setting-filter-state">Filter by state</label>
+                    <fieldset id="display-setting-filter-state">
+                        <input type="radio" value="" id="display-setting-filter-state-empty" name="filter-state" checked>
+                        <label for="display-setting-filter-state-empty">all</label>
+                        <input type="radio" value="0" id="display-setting-filter-state-notread" name="filter-state">
+                        <label for="display-setting-filter-state-notread">Not read</label>
+                        <input type="radio" value="1" id="display-setting-filter-state-reading" name="filter-state">
+                        <label for="display-setting-filter-state-reading">Reading</label>
+                        <input type="radio" value="2" id="display-setting-filter-state-read" name="filter-state">
+                        <label for="display-setting-filter-state-read">Read</label>
+                    </fieldset>
+                </div>
             </div>
+
 
             <div id="display-setting-orderby-div" class="display-setting">
                 <select id="display-setting-orderby" name="orderby">

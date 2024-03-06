@@ -782,7 +782,6 @@ function stopChangeReadPages_callback(e){
 
 function likeToggle_callback(e){
     let elem = e.target;
-    let thisBook = elem.bookBoxDiv.book;
     elem.bookBoxDiv.book.favourite = elem.bookBoxDiv.classList.toggle('favourite');
 }
 
@@ -839,6 +838,7 @@ function displaySettingOrderByDescend_callback(e){
 function displaySettingSearch_callback(e){
     displaySettings.search = e.target.value;
     searchBooks();
+    adaptBookTitlesSize();
 }
 
 function displaySettingFilterFavourites_callback(e){
@@ -848,7 +848,19 @@ function displaySettingFilterFavourites_callback(e){
     displaySettings.updateFilterArgInDisplaySettings();
 
     filterBooks();
+    adaptBookTitlesSize();
 }
+
+function displaySettingFilterState_callback(e){
+    displaySettings.getIntegerValueFromStr('simplifiedStateId', e.target.value);     
+    
+    /* Update filter argument: trasform the properties of displaySettings.filter to an array (discarding the keys) */
+    displaySettings.updateFilterArgInDisplaySettings();
+
+    filterBooks();
+    adaptBookTitlesSize();
+}
+
 
 /* Display settings object */
 
@@ -869,9 +881,11 @@ function DisplaySettings(){
 
     let displaySettingFilterFavourites = document.querySelector("#display-setting-filter-favourites");
     let filterFavouritesValueStr = getCheckedRadioValueAmongDescendants(displaySettingFilterFavourites);
-
     this.getLogicValueFromStr('favourite', filterFavouritesValueStr);
 
+    let displaySettingFilterState = document.querySelector("#display-setting-filter-state");
+    let filterStateValueStr = getCheckedRadioValueAmongDescendants(displaySettingFilterState);
+    this.getIntegerValueFromStr('simplifiedStateId', filterStateValueStr);    
 
     this.updateFilterArgInDisplaySettings(); /* this sets .filterArg*/
 
@@ -882,6 +896,13 @@ DisplaySettings.prototype.getLogicValueFromStr = function(property,str){
         this.filter[property] =  attributeForFilter(property, ); // empty values
     else
         this.filter[property] =  attributeForFilter(property, str == true);  
+};
+
+DisplaySettings.prototype.getIntegerValueFromStr = function(property,str){
+    if (str == "")
+        this.filter[property] =  attributeForFilter(property, ); // empty values
+    else
+        this.filter[property] =  attributeForFilter(property, parseInt(str));  
 };
 
 DisplaySettings.prototype.updateFilterArgInDisplaySettings = function(){
@@ -914,6 +935,10 @@ function initRandomLibrary(library,numOfBooks){ // library is an object, passed 
         book.setBookBoxDiv(bookBox);
         updateBookInfo(bookBox,book);
         booksContainer.appendChild(bookBox);
+
+        /* Randomly set is as favourite */
+        if (randomInt(0,1))
+            book.favourite = bookBox.classList.toggle('favourite');
     }
 }
 
@@ -979,9 +1004,11 @@ function initInterface(){
 
     let displaySettingFilterFavourites = document.querySelector("#display-setting-filter-favourites");
     displaySettingFilterFavourites.addEventListener('change', displaySettingFilterFavourites_callback);
+
+    let displaySettingFilterState = document.querySelector("#display-setting-filter-state");
+    displaySettingFilterState.addEventListener('change', displaySettingFilterState_callback);
     
     adaptBookTitlesSize();
-
     updateDisplayBooks();
 }
 

@@ -165,7 +165,7 @@
     --author-txt-shadow: var(--col-black) 0px 0px 3px;
 
     /* Animations on hover / active / ...*/
-    --transition-time: 0.3s;
+    --transition-time: 0.1s;
 }
 
 ::backdrop {
@@ -958,10 +958,11 @@ fieldset input:checked+label{
     display: grid;
     grid-template-columns: 1fr min-content;
     grid-template-areas:
-        "filter-favourites filter-favourites"
+        "filter filter"
         "search order";
     gap: var(--display-settings-gap);
     user-select: none;
+    align-items: end;
 }
 
 .display-setting{
@@ -1040,27 +1041,53 @@ fieldset input:checked+label{
 
 /****/
 
-#display-setting-filter-favourites-div{
-    grid-area: filter-favourites;
-    flex: 1;
+#display-setting-filter-div{
+    grid-area: filter;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--display-settings-gap);
 }
 
-#display-setting-filter-favourites>label{
-    grid-area: label;
+#display-setting-filter-favourites-div,
+#display-setting-filter-state-div{
+    text-align: center;
 }
-#display-setting-filter-favourites{
+
+#display-setting-filter-favourites>label,
+#display-setting-filter-state>label{
+    grid-area: label;
+
+}
+#display-setting-filter-favourites,
+#display-setting-filter-state{
     /*fieldset*/
     grid-area: input;
 }
-#display-setting-filter-favourites label{
+#display-setting-filter-favourites label,
+#display-setting-filter-state label{
     font-size: var(--display-settings-unselected-fontsize);
     line-height: calc(2 * var(--dialog-input-lineheight));
     height: var(--display-settings-input-height);
     font-variant: normal;
+    font-weight: normal;
 }
-#display-setting-filter-favourites input:checked+label{
+#display-setting-filter-favourites input:checked+label,
+#display-setting-filter-state input:checked+label{
     font-size: var(--display-settings-fontsize);
-    flex: 3;
+    flex: 1.5;
+    font-weight: bold;
+}
+#display-setting-filter-favourites label:first-of-type,
+#display-setting-filter-state label:first-of-type{
+    flex: 0;
+    width: min-content;
+    padding: 0 calc(var(--radius) / 2) 0;
+}
+#display-setting-filter-favourites input:checked+label:first-of-type,
+#display-setting-filter-state input:checked+label:first-of-type{
+    flex: 0;
+    background-color: var(--col-grey);
+    color: var(--col-black);
 }
 
 
