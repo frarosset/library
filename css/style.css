@@ -934,6 +934,7 @@ fieldset input:checked+label{
 /* || Display settings */
 :root{
     --display-settings-padding-bottom:  30px;
+    --display-settings-gap:      20px;
 
     --display-settings-label-fontsize:  1rem;
     --display-settings-fontsize:        1.2rem;
@@ -947,11 +948,25 @@ fieldset input:checked+label{
     --display-settings-btn-fontsize:    var(--display-settings-label-fontsiz);
     --display-settings-btn-border-width:0px;
     --display-setting-orderby-gap:      0.5rem;
+    --display-setting-orderby-width:    12rem;
 
 }
 
 .display-settings{
     padding-bottom: var(--display-settings-padding-bottom);
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-template-areas:
+        "search order";
+    gap: var(--display-settings-gap);
+}
+
+.display-setting{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "label"
+        "input";
 }
 
 .display-settings label{
@@ -967,15 +982,17 @@ fieldset input:checked+label{
     outline: none;
     border-bottom: 1px solid var(--display-settings-line-color);
     height: var(--display-settings-input-height);
+    width: 100%;
 }
 
 #display-setting-orderby-div{
+    grid-area: order;
     display: grid;
     grid-template-columns: 1fr min-content;
     grid-template-areas:
         "label-orderby  label-order"
         "select-orderby button-order";
-    gap: var(--display-setting-orderby-gap);
+    gap: 0px var(--display-setting-orderby-gap);
 }
 
 #display-setting-orderby>label{
@@ -986,6 +1003,7 @@ fieldset input:checked+label{
 }
 #display-setting-orderby{
     grid-area: select-orderby;
+    width: var(--display-setting-orderby-width);
 }
 #display-setting-orderby-descend-btn{
     --btn-height: var(--display-settings-input-height);
@@ -1000,7 +1018,17 @@ fieldset input:checked+label{
     background-color: transparent;
 }
 
+#display-setting-search-div{
+    grid-area: search;
+    flex: 1;
+}
 
+#display-setting-search>label{
+    grid-area: label;
+}
+#display-setting-search{
+    grid-area: input;
+}
 
 
 /* || Icons sources */

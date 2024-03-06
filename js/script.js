@@ -246,7 +246,7 @@ Library.prototype.search = function (str,properties=['title','author']) {
     if (this.books.length==0)
         return;
 
-    str = str.toLowerCase();
+    str = str.toLowerCase().trim();
 
     if (properties.length==undefined || properties.length==0)
         properties = Object.keys(myLibrary.books[0]);
@@ -792,7 +792,19 @@ function sortBooks(){
     // to be called when:
     //  - the method of sorting changes
     //  - a new book is added (todo)
+    //  - the state / favourite changes (todo)
     myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend)
+}
+
+function searchBooks(){
+    // to be called when:
+    //  - the search text changes
+    //  - a new book is added (todo)
+    //  - when a property to search in changes in a book 
+    //    (warning: here this does not happens as we will only search in the title and author fixed fields)
+
+    // you can filter both because of the search field, and the explicit filters
+    myLibrary.search(displaySettings.search, ['title','author']);
 }
 
 function displaySettingOrderby_callback(e){
@@ -805,7 +817,10 @@ function displaySettingOrderByDescend_callback(e){
     sortBooks();
 }
 
-
+function displaySettingSearch_callback(e){
+    displaySettings.search = e.target.value;
+    searchBooks();
+}
 
 
 /* Get template data --------------------------------------- */
@@ -889,9 +904,11 @@ function initInterface(){
     displaySettings.orderByDescend = displaySettingOrderByDescend.classList.contains('descend'); /* init */
     displaySettingOrderByDescend.addEventListener('click', displaySettingOrderByDescend_callback);
     
+    let displaySettingSearch = document.querySelector("#display-setting-search");
+    displaySettings.search = displaySettingSearch.value; /* init */
+    displaySettingSearch.addEventListener('input', displaySettingSearch_callback);
 
     
-
     adaptBookTitlesSize();
 }
 
