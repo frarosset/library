@@ -693,20 +693,24 @@ main{
 
 /* || Book box: hover */
 
+.books-container.view-text .book-box .book-image-section,
 .book-box:hover .book-image-section{
     height: 0;
 }
 
+.books-container.view-text .book-box .book-data-section,
 .book-box:hover .book-data-section{
     padding: var(--book-box-padding);
     height: var(--book-data-height);
     background-color: var(--book-data-bg-col);
 }
 
+.books-container.view-text .book-box .book-footer-section,
 .book-box:hover .book-footer-section{
     background-color: var(--book-data-bg-col);
 }
 
+.books-container.view-text .book-box .book-addedon,
 .book-box:hover .book-addedon{
     visibility: visible;
     opacity: 1;
@@ -723,6 +727,7 @@ main{
     color: var(--book-page-btn-col-active);
 }
 
+.books-container.view-text .book-box .book-footer-section .book-icons div:not(.like)::before,
 .book-box:hover .book-footer-section .book-icons div:not(.like)::before{
     visibility: visible;
 }
@@ -1012,6 +1017,7 @@ fieldset input:checked+label{
     grid-area: select-orderby;
     width: var(--display-setting-orderby-width);
 }
+#display-setting-view-info-btn,
 #display-setting-orderby-descend-btn{
     --btn-height: var(--display-settings-input-height);
     --btn-width: var(--display-settings-btn-width);
@@ -1019,10 +1025,13 @@ fieldset input:checked+label{
     --btn-icon-len: var(--display-settings-input-height);
     --btn-fontsize: var(--display-settings-btn-fontsize);
     --btn-border-width: var(--display-settings-btn-border-width);
-    grid-area: button-order;
     align-self: end;
     border-radius: 0;
     background-color: transparent;
+}
+
+#display-setting-orderby-descend-btn{
+    grid-area: button-order;
 }
 
 /****/
@@ -1044,20 +1053,23 @@ fieldset input:checked+label{
 #display-setting-filter-div{
     grid-area: filter;
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 0.5fr 2fr min-content;
     gap: var(--display-settings-gap);
 }
 
+#display-setting-view-info-div,
 #display-setting-filter-favourites-div,
 #display-setting-filter-state-div{
     text-align: center;
 }
 
+#display-setting-view-info-div>label,
 #display-setting-filter-favourites>label,
 #display-setting-filter-state>label{
     grid-area: label;
 
 }
+#display-setting-view-info-btn,
 #display-setting-filter-favourites,
 #display-setting-filter-state{
     /*fieldset*/
@@ -1117,6 +1129,14 @@ fieldset input:checked+label{
 
 .book-footer-section .book-icons div.del::before{
     mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>delete-outline</title><path d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg>');
+}
+
+.display-settings div.view-info::before{
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>image</title><path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z" /></svg>');
+}
+
+.display-settings #display-setting-view-info-btn.view-text div.view-info::before{
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>text-box-search</title><path d="M15.5,12C18,12 20,14 20,16.5C20,17.38 19.75,18.21 19.31,18.9L22.39,22L21,23.39L17.88,20.32C17.19,20.75 16.37,21 15.5,21C13,21 11,19 11,16.5C11,14 13,12 15.5,12M15.5,14A2.5,2.5 0 0,0 13,16.5A2.5,2.5 0 0,0 15.5,19A2.5,2.5 0 0,0 18,16.5A2.5,2.5 0 0,0 15.5,14M7,15V17H9C9.14,18.55 9.8,19.94 10.81,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19A2,2 0 0,1 21,5V13.03C19.85,11.21 17.82,10 15.5,10C14.23,10 13.04,10.37 12.04,11H7V13H10C9.64,13.6 9.34,14.28 9.17,15H7M17,9V7H7V9H17Z" /></svg>');
 }
 
 .display-settings div.orderby-descend::before{

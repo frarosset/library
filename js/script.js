@@ -861,6 +861,10 @@ function displaySettingFilterState_callback(e){
     adaptBookTitlesSize();
 }
 
+function displaySettingViewInfo_callback(e){
+    e.target.classList.toggle('view-text');
+    booksContainer.classList.toggle('view-text');
+}
 
 /* Display settings object */
 
@@ -1007,6 +1011,9 @@ function initInterface(){
 
     let displaySettingFilterState = document.querySelector("#display-setting-filter-state");
     displaySettingFilterState.addEventListener('change', displaySettingFilterState_callback);
+
+    let displaySettingViewInfo = document.querySelector("#display-setting-view-info-btn");
+    displaySettingViewInfo.addEventListener('click', displaySettingViewInfo_callback);
     
     adaptBookTitlesSize();
     updateDisplayBooks();
