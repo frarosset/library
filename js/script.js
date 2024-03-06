@@ -1,4 +1,4 @@
-let currentId = 0; // Global variable
+let currentId; // Global variable
 let InitialNumOfBooks = 25;
 
 let simplifiedStatesOfRead = ['not read yet', 'reading','read'];
@@ -198,7 +198,7 @@ Library.prototype.sortBy = function (property, descend = false) {
     if (descend)
         this.books.reverse();
 
-    console.table(this.books);
+    //console.table(this.books);
 
     // Update the displayed order
     this.books.map((itm,idx) => itm.bookBoxDiv.style.order = idx);
@@ -212,6 +212,7 @@ function attributeForFilter(property,...values){
 Library.prototype.filterBy = function (...attributes) {
     // attributes: array of {property: 'year', values: [1999,2009]]}: see function attributeForFilter()
     // this function ASSUMES that each property is reported only once in attributes array
+    // a "" value is ignored
     if (this.books.length==0)
         return;
 
@@ -222,7 +223,7 @@ Library.prototype.filterBy = function (...attributes) {
     this.books.map(itm => itm.show = true);
 
     attributes.map(attr =>{        
-        if (!attr.property in this.books[0])
+        if (!attr.property in this.books[0] || attr.values.length==0 || attr.values=="")
             return;
 
         this.books.map(itm => {
@@ -231,7 +232,7 @@ Library.prototype.filterBy = function (...attributes) {
         });
     });
 
-    console.table(this.books.filter(itm => itm.show));
+    //console.table(this.books.filter(itm => itm.show));
 
     // Update the displayed order
     this.books.map((itm) => {
@@ -243,9 +244,15 @@ Library.prototype.filterBy = function (...attributes) {
 }
 
 Library.prototype.search = function (str,properties=['title','author']) {
+    // a "" string is ignored
     if (this.books.length==0)
         return;
 
+    if (str==""){
+        this.books.map(itm => itm.matched = true);
+        return;
+    }
+        
     str = str.toLowerCase().trim();
 
     if (properties.length==undefined || properties.length==0)
@@ -263,7 +270,7 @@ Library.prototype.search = function (str,properties=['title','author']) {
         });
     });
 
-    console.table(this.books.filter(itm => itm.matched));
+    //console.table(this.books.filter(itm => itm.matched));
 
     // Update the displayed order
     this.books.map((itm) => {
@@ -274,7 +281,11 @@ Library.prototype.search = function (str,properties=['title','author']) {
     });
 }
 
-
+function updateDisplayBooks(){
+    sortBooks();
+    searchBooks();
+    filterBooks();
+}
 
 /* Book Box (DOM)*/
 /* HTML CODE TO GENERATE:
@@ -714,8 +725,6 @@ function deleteThisBook_callback(e){
     let thisBookDiv = e.target.bookBoxDiv;
     let thisBook = e.target.bookBoxDiv.book;
 
-    console.log(myLibrary)
-
     /* Delete all the childred and the descendants of thisBookDiv,
        and then, thisBookDiv itself*/
     removeDescendants(thisBookDiv);
@@ -804,7 +813,17 @@ function searchBooks(){
     //    (warning: here this does not happens as we will only search in the title and author fixed fields)
 
     // you can filter both because of the search field, and the explicit filters
-    myLibrary.search(displaySettings.search, ['title','author']);
+    myLibrary.search(displaySettings.search, displaySettings.searchInProperties);
+}
+
+function filterBooks(){
+    // to be called when:
+    //  - a filter changes
+    //  - a new book is added (todo)
+    //  - when a property to filter changes in a book 
+
+    // you can filter both because of the search field, and the explicit filters
+    myLibrary.filterBy(...displaySettings.filterArg);
 }
 
 function displaySettingOrderby_callback(e){
@@ -821,6 +840,59 @@ function displaySettingSearch_callback(e){
     displaySettings.search = e.target.value;
     searchBooks();
 }
+
+function displaySettingFilterFavourites_callback(e){
+    displaySettings.getLogicValueFromStr('favourite', e.target.value);     
+    
+    /* Update filter argument: trasform the properties of displaySettings.filter to an array (discarding the keys) */
+    displaySettings.updateFilterArgInDisplaySettings();
+
+    filterBooks();
+}
+
+/* Display settings object */
+
+function DisplaySettings(){
+
+    let displaySettingOrderby = document.querySelector("#display-setting-orderby");
+    this.orderBy = displaySettingOrderby.value;
+
+    let displaySettingOrderByDescend = document.querySelector("#display-setting-orderby-descend-btn");
+    this.orderByDescend = displaySettingOrderByDescend.classList.contains('descend');
+
+    let displaySettingSearch = document.querySelector("#display-setting-search");
+    this.search = displaySettingSearch.value;
+
+    this.searchInProperties = ['title','author'];
+
+    this.filter = {};
+
+    let displaySettingFilterFavourites = document.querySelector("#display-setting-filter-favourites");
+    let filterFavouritesValueStr = getCheckedRadioValueAmongDescendants(displaySettingFilterFavourites);
+
+    this.getLogicValueFromStr('favourite', filterFavouritesValueStr);
+
+
+    this.updateFilterArgInDisplaySettings(); /* this sets .filterArg*/
+
+}
+
+DisplaySettings.prototype.getLogicValueFromStr = function(property,str){
+    if (str == "")
+        this.filter[property] =  attributeForFilter(property, ); // empty values
+    else
+        this.filter[property] =  attributeForFilter(property, str == true);  
+};
+
+DisplaySettings.prototype.updateFilterArgInDisplaySettings = function(){
+    /* Update filter argument: trasform the properties of displaySettings.filter to an array (discarding the keys) */
+    this.filterArg = Object.entries(this.filter).map(itm => itm[1]);
+};
+
+function getCheckedRadioValueAmongDescendants(ascendentElement){
+    return ascendentElement.querySelector("input[type=radio]:checked").value;
+}
+
 
 
 /* Get template data --------------------------------------- */
@@ -897,19 +969,20 @@ function initInterface(){
 
     /* Display settings */
     let displaySettingOrderby = document.querySelector("#display-setting-orderby");
-    displaySettings.orderBy = displaySettingOrderby.value; /* init */
     displaySettingOrderby.addEventListener('change', displaySettingOrderby_callback);
     
     let displaySettingOrderByDescend = document.querySelector("#display-setting-orderby-descend-btn");
-    displaySettings.orderByDescend = displaySettingOrderByDescend.classList.contains('descend'); /* init */
     displaySettingOrderByDescend.addEventListener('click', displaySettingOrderByDescend_callback);
     
     let displaySettingSearch = document.querySelector("#display-setting-search");
-    displaySettings.search = displaySettingSearch.value; /* init */
     displaySettingSearch.addEventListener('input', displaySettingSearch_callback);
 
+    let displaySettingFilterFavourites = document.querySelector("#display-setting-filter-favourites");
+    displaySettingFilterFavourites.addEventListener('change', displaySettingFilterFavourites_callback);
     
     adaptBookTitlesSize();
+
+    updateDisplayBooks();
 }
 
 /* Some sample data --------------------------------------- */
@@ -965,9 +1038,9 @@ const sampleBooks = [
 
 /* Initialization + Testing code */
 let booksContainer = document.querySelector(".books-container");
-let displaySettings = {};
+let displaySettings = new DisplaySettings();
 
 let myLibrary = new Library();
 initRandomLibrary(myLibrary,InitialNumOfBooks);
 initInterface();
-myLibrary.printInfo();
+//myLibrary.printInfo();

@@ -938,6 +938,7 @@ fieldset input:checked+label{
 
     --display-settings-label-fontsize:  1rem;
     --display-settings-fontsize:        1.2rem;
+    --display-settings-unselected-fontsize: calc(var(--display-settings-fontsize) * 0.5);
     --display-settings-line-color:      var(--col-grey);
 
     --display-settings-input-height:    max(2.2rem, calc(var(--display-settings-fontsize) * var(--txt-lineheight) + 1px)); /*1px: border bottom of input*/
@@ -957,8 +958,10 @@ fieldset input:checked+label{
     display: grid;
     grid-template-columns: 1fr min-content;
     grid-template-areas:
+        "filter-favourites filter-favourites"
         "search order";
     gap: var(--display-settings-gap);
+    user-select: none;
 }
 
 .display-setting{
@@ -983,7 +986,10 @@ fieldset input:checked+label{
     border-bottom: 1px solid var(--display-settings-line-color);
     height: var(--display-settings-input-height);
     width: 100%;
+    background-color: transparent;
 }
+
+/****/
 
 #display-setting-orderby-div{
     grid-area: order;
@@ -1018,6 +1024,8 @@ fieldset input:checked+label{
     background-color: transparent;
 }
 
+/****/
+
 #display-setting-search-div{
     grid-area: search;
     flex: 1;
@@ -1029,6 +1037,32 @@ fieldset input:checked+label{
 #display-setting-search{
     grid-area: input;
 }
+
+/****/
+
+#display-setting-filter-favourites-div{
+    grid-area: filter-favourites;
+    flex: 1;
+}
+
+#display-setting-filter-favourites>label{
+    grid-area: label;
+}
+#display-setting-filter-favourites{
+    /*fieldset*/
+    grid-area: input;
+}
+#display-setting-filter-favourites label{
+    font-size: var(--display-settings-unselected-fontsize);
+    line-height: calc(2 * var(--dialog-input-lineheight));
+    height: var(--display-settings-input-height);
+    font-variant: normal;
+}
+#display-setting-filter-favourites input:checked+label{
+    font-size: var(--display-settings-fontsize);
+    flex: 3;
+}
+
 
 
 /* || Icons sources */
