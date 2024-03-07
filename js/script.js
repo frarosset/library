@@ -270,6 +270,9 @@ Library.prototype.search = function (str,properties=['title','author']) {
 
     if (str==""){
         this.books.map(itm => itm.matched = true);
+        this.books.map((itm) => {
+            itm.bookBoxDiv.classList.remove('unmatched');
+        });
         return;
     }
         
@@ -797,7 +800,19 @@ function closeModal_callback(e){
     e.target.associatedModal.close();
 }
 
-function newBookAddBtn_callback(e){
+function newBookCancelModal_callback(e){
+    e.target.associatedForm.reset();
+    closeModal_callback(e);
+}
+
+function newBookAddSubmit_callback(e){
+    // cancels the form submission
+    // not needed with method='dialog' on form
+    // e.preventDefault();
+
+    // Additional validation
+    //todo
+
 
     /* Get the book data from the form and add it to the library */
     addNewBookToLibrary(newBookFormDataDOM.getBookFromForm());
@@ -805,12 +820,12 @@ function newBookAddBtn_callback(e){
     adaptBookTitlesSize();
     updateDisplayBooks();
 
+    // Clear the form data
+    e.target.reset();
 
-    // e.preventDefault(); // don't submit this form
-    e.target.associatedModal.close(); // Have to send the select box value here.
-    // clear the form data
-
-    console.table(myLibrary.books);
+    // Close the form data
+    // not needed with method='dialog' on form
+    // e.target.associatedModal.close(); 
  }
 
 
@@ -1056,7 +1071,7 @@ function initInterface(){
 
     let newBookCancelBtn = document.querySelector("#dialog-new-book button.cancel");
     let newBookSuggestBtn = document.querySelector("#dialog-new-book button.suggest");
-    let newBookAddBtn = document.querySelector("#dialog-new-book button.add");
+    let newBookAddForm = document.querySelector("#add-new-book-form");
 
     let clearAllBtn = document.querySelector(".header-container button.clear-all");
     let clearAllDialog = document.querySelector("#dialog-clear-all");
@@ -1066,8 +1081,9 @@ function initInterface(){
     
     newBookBtn.associatedModal = newBookDialog;
     newBookCancelBtn.associatedModal = newBookDialog;
+    newBookCancelBtn.associatedForm = newBookAddForm;
     newBookSuggestBtn.associatedModal = newBookDialog;
-    newBookAddBtn.associatedModal = newBookDialog;
+    newBookAddForm.associatedModal = newBookDialog;
 
     clearAllBtn.associatedModal = clearAllDialog;
     clearAllCancelBtn.associatedModal = clearAllDialog;
@@ -1076,11 +1092,11 @@ function initInterface(){
     newBookBtn.addEventListener('click',showModal_callback);
     clearAllBtn.addEventListener('click',showModal_callback);
 
-    newBookCancelBtn.addEventListener('click',closeModal_callback);
+    newBookCancelBtn.addEventListener('click',newBookCancelModal_callback);
     clearAllCancelBtn.addEventListener('click',closeModal_callback);
 
     //newBookSuggestBtn.addEventListener('click',newBookSuggest_callback); /* TODO */
-    newBookAddBtn.addEventListener('click',newBookAddBtn_callback); 
+    newBookAddForm.addEventListener('submit',newBookAddSubmit_callback); 
     clearAllYesBtn.addEventListener('click',clearAll_callback);
 
     /* dialog for deleteThisBook functionality*/
