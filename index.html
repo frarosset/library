@@ -96,14 +96,14 @@
     </header>
     <main class="main-container">
         <div class="display-settings">
-            <div id="display-setting-filter-div">
+            <div id="display-setting-show-div">
                 <div id="display-setting-filter-favourites-div" class="display-setting">
                     <label for="display-setting-filter-favourites">Show</label>
                     <fieldset id="display-setting-filter-favourites">
                         <input type="radio" value="" id="display-setting-filter-favourites-empty" name="filter-favourites" checked>
                         <label for="display-setting-filter-favourites-empty">all</label>
                         <input type="radio" value="1" id="display-setting-filter-favourites-yes" name="filter-favourites">
-                        <label for="display-setting-filter-favourites-yes">Favourites</label>
+                        <label for="display-setting-filter-favourites-yes"><div class="icon favourites-yes"></div></label>
                     </fieldset>
                 </div>    
                 <div id="display-setting-filter-state-div" class="display-setting">
@@ -124,8 +124,6 @@
                     <label for="display-setting-view-info-btn">View</label>
                 </div>
             </div>
-
-
             <div id="display-setting-orderby-div" class="display-setting">
                 <select id="display-setting-orderby" name="orderby">
                     <option value="id" selected disabled>-</option>

@@ -778,11 +778,13 @@ function startIncreaseReadPages_callback(e){
 function stopChangeReadPages_callback(e){
     let btn = e.target;
     clearInterval(btn.interval);
+    updateDisplayBooks();
 }
 
 function likeToggle_callback(e){
     let elem = e.target;
     elem.bookBoxDiv.book.favourite = elem.bookBoxDiv.classList.toggle('favourite');
+    updateDisplayBooks()
 }
 
 function adaptBookTitlesSizeResize_callback(){
@@ -809,7 +811,7 @@ function searchBooks(){
     //  - the search text changes
     //  - a new book is added (todo)
     //  - when a property to search in changes in a book 
-    //    (warning: here this does not happens as we will only search in the title and author fixed fields)
+    //    (note: here this does not happens as we will only search in the title and author fixed fields)
 
     // you can filter both because of the search field, and the explicit filters
     myLibrary.search(displaySettings.search, displaySettings.searchInProperties);
