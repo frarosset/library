@@ -8,9 +8,9 @@
     --col-grey:          #E0DFD5; /* RGB(224, 223, 213) */
     --col-black:         #313638;
     --col-accent-dark:   #EF6461;
-    --col-accent-light:  #E4B363;
+    --col-accent-light:  #e29f6e; /*#E4B363;*/
 
-    --col-white-with-alpha: rgba(232, 233, 235, 1); /*#E8E9EB with alpha*/
+    --col-white-with-alpha: rgba(232, 233, 235, 0.2); /*#E8E9EB with alpha*/
     --col-purewhite-with-alpha: rgba(255, 255, 255, 0.8); /*#ffffff with alpha*/
     --col-black-with-alpha:rgba(49,54,56, 0.7); /*#313638 with alpha*/
     --col-transparent:    rgba(0, 0, 0, 0); 
@@ -43,7 +43,7 @@
     --dialog-label-color: var(--col-white);
     --dialog-label-focus-color: var(--col-grey);
 
-    --book-title-col:           var(--col-black);
+    --book-title-col:           var(--col-purewhite);
     --book-author-col-secondary:var(--col-grey);
     --book-author-col:          var(--col-purewhite);
     --book-data-col:            var(--col-accent-light);
@@ -120,7 +120,7 @@
 
     --main-padding:         25px;
 
-    --books-container-gap:  20px;
+    --books-container-gap:  2rem;
 
     --book-box-max-width:   200px;
 
@@ -131,7 +131,7 @@
     --book-box-data-gap-ver: 15px;
     --book-box-data-gap-hor: 10px;
     --book-box-data-gap:     var(--book-box-data-gap-ver) var(--book-box-data-gap-hor);
-    --book-author-bottom-padding: var(--book-box-padding);
+    --book-author-bottom-padding: calc(2 * var(--book-box-padding));
 
     --book-state-height:    80px;
     --book-state-height:    calc(var(--book-property-height) + var(--book-page-btn-height) + var(--book-box-data-gap-ver));
@@ -182,12 +182,12 @@
     /* Shadows */
     --outset-shadow-center: 0px 0px 3px var(--col-black);
     --outset-shadow-below: 0px 1px 5px var(--col-black);
-    --outset-shadow-top: 0px -1px 2px var(--col-black);
-    --title-txt-shadow: var(--col-purewhite) 0px 0px 3px;
+    --outset-shadow-top: 0px -1px 3px var(--col-black);
+    --title-txt-shadow: var(--col-black) 0px 0px 3px;
     --author-txt-shadow: var(--col-black) 0px 0px 3px;
 
     /* Animations on hover / active / ...*/
-    --transition-time: 0.1s;
+    --transition-time: 0.3s;
 }
 
 ::backdrop {
@@ -501,7 +501,7 @@ main{
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 3px;
+    padding: 5px;
     
     border-radius: var(--radius);
     background-color: var(--book-title-bg-col);
@@ -555,7 +555,7 @@ main{
     text-align: center;
     gap: var(--book-box-data-gap);
 
-    border-radius: var(--radius) var(--radius) 0 0;
+    border-radius: calc(var(--radius) * 2) calc(var(--radius) * 2) 0 0;
     box-shadow: var(--outset-shadow-top);
 }
 
