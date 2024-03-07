@@ -42,7 +42,7 @@ function checkOverflow(el)
 
 /* Book Constructor --------------------------------------- */
 
-function Book(title, author, pages, genre='-', year='-', pagesRead=0) {
+function Book(title, author, pages, genre='', year=NaN, pagesRead=0) {
     this.title = title;
     this.author = author;
     this.genre = genre;
@@ -182,11 +182,29 @@ Library.prototype.sortBy = function (property, descend = false) {
     let sampleItem = this.books[0][property];
 
     if (typeof sampleItem == 'number')
-        this.books.sort((a,b) => a[property] - b[property]);
+        this.books.sort((a,b) => {
+            let aNum = a[property];
+            let bNum = b[property];
+            // Fix for NaN: these are pushed at the beginning
+            // see https://stackoverflow.com/questions/17557807/how-do-you-sort-a-javascript-array-that-includes-nans
+            let aIsNum = isFinite(aNum);
+            let bIsNum = isFinite(bNum);
+            if (aIsNum){
+                if (bIsNum)
+                    return aNum - bNum; // both numeric
+                else
+                    return 1; // b [not numeric] < a
+            } else {
+                if (bIsNum)
+                    return -1; // a [not numeric] < b
+                else
+                    return 0; //  both not numeric
+            }
+        });
     else if (typeof sampleItem == 'string') // alphabetical order
         this.books.sort((a,b) => {
-            aStr = a[property].toUpperCase();
-            bStr = b[property].toUpperCase();
+            let aStr = a[property].toUpperCase();
+            let bStr = b[property].toUpperCase();
             if (aStr < bStr)
                 return -1;
             else if (aStr > bStr)
@@ -397,7 +415,8 @@ function createNewBookBox(newBook){
 
     let bookGenreSection_div_var = document.createElement('div');
     bookGenreSection_div_var.classList.add('var-data','var-genre');
-    bookGenreSection_div_var.textContent = newBook.genre;
+    // this might be empy '' --> display '-' in that case
+    bookGenreSection_div_var.textContent = newBook.genre != '' ? newBook.genre : '-';
 
     let bookGenreSection_div_lbl = document.createElement('div');
     bookGenreSection_div_lbl.textContent = 'genre';
@@ -412,7 +431,9 @@ function createNewBookBox(newBook){
 
     let bookYearSection_div_var = document.createElement('div');
     bookYearSection_div_var.classList.add('var-data','var-year');
-    bookYearSection_div_var.textContent = newBook.year;
+    let year = newBook.year;
+    // this might be NaN (if year!==year) --> display '-' in that case
+    bookYearSection_div_var.textContent = year === year ? year : '-';
 
     let bookYearSection_div_lbl = document.createElement('div');
     bookYearSection_div_lbl.textContent = 'year';
@@ -719,13 +740,8 @@ function getRandomSampleBook(i){
     // sampleBooks is a formatted array: the info in each item are in a specific order:
     // [title,author,pages,genre,year]
     // Here sampleBooks is just hardcoded...in general you could retrieve it from a database or csv file
-     let title  = bookData[0];
-     let author = bookData[1];
-     
-     let genre  = bookData[3];
-     let year   = bookData[4];
-     
-     // Generate a random simplified state: 'not read yet' or 'reading' or 'read'
+
+    // Generate a random simplified state: 'not read yet' or 'reading' or 'read'
      // if the state is reading, generate a more specific state by generating a random nmber of pages read
      let pages  = bookData[2];
      let simplifiedState =  randomInt(0,2);
@@ -733,18 +749,6 @@ function getRandomSampleBook(i){
   
     return [...bookData,pagesRead];
  }
-
- function getBookFromForm(){
-    // Get the data (todo)
-    let title = 'Hello';
-    let author = 'World';
-    let pages = '52';
-    let genre = 'What?';
-    let year = 1234;
-    let pagesRead = 1;
-  
-    return [title,author,pages,genre,year,pagesRead];
-}
 
 function addNewBookToLibrary(bookDataArray){
     // Create a new book and add it to the library
@@ -760,6 +764,30 @@ function addNewBookToLibrary(bookDataArray){
     return bookBox;
  }
 
+function newBookFormDOM(){
+    this.title = document.querySelector('#new-book-title');
+    this.author = document.querySelector('#new-book-author');
+    
+    this.pages = document.querySelector('#new-book-pages');
+    this.genre = document.querySelector('#new-book-genre');
+
+    this.year = document.querySelector('#new-book-year');
+    this.pagesRead = document.querySelector('#new-book-pagesread');
+}
+
+newBookFormDOM.prototype.getBookFromForm = function(){
+    // Get the data (todo)
+    let title       = this.title.value;
+    let author      = this.author.value;
+    let pages       = parseInt(this.pages.value);
+    let genre       = this.genre.value;
+    let year        = parseInt(this.year.value);
+    let pagesRead   = parseInt(this.pagesRead.value);
+  
+    return [title,author,pages,genre,year,pagesRead];
+};
+ 
+
 /* Buttons callbacks */
 function showModal_callback(e){
     e.target.associatedModal.showModal();
@@ -772,7 +800,7 @@ function closeModal_callback(e){
 function newBookAddBtn_callback(e){
 
     /* Get the book data from the form and add it to the library */
-    addNewBookToLibrary(getBookFromForm());
+    addNewBookToLibrary(newBookFormDataDOM.getBookFromForm());
 
     adaptBookTitlesSize();
     updateDisplayBooks();
@@ -1148,6 +1176,7 @@ const sampleBooks = [
 
 /* Initialization + Testing code */
 let booksContainer = document.querySelector(".books-container");
+let newBookFormDataDOM = new newBookFormDOM();
 let displaySettings = new DisplaySettings();
 
 let myLibrary = new Library();
