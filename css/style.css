@@ -24,7 +24,7 @@
 
     --dialog-bg-col:            var(--col-purewhite); 
 
-    --book-itm-bg-col:          var(--bg-col);
+    --book-itm-bg-col:          var(--col-black-with-alpha);
     --book-title-bg-col:        var(--col-white-with-alpha);
     --book-data-bg-col:         var(--col-black-with-alpha);
 
@@ -797,6 +797,12 @@ dialog{
     --btn-border-width: var(--dialog-btn-border-width);
 }
 
+.dialog-buttons button.suggest{
+    --btn-width: max-content;
+    padding-left: var(--dialog-padding);
+    padding-right: var(--dialog-padding);
+}
+
 
 /* | Dialog new book */
 dialog#dialog-new-book{
@@ -843,7 +849,7 @@ dialog#dialog-new-book{
 
 form>.input-field{
     display: grid; 
-    grid-template-columns: 5.5em 1fr;
+    grid-template-columns: 5.8em 1fr;
     grid-template-areas:
         "label input"; 
     overflow: hidden;

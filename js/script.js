@@ -1,5 +1,7 @@
 let currentId; // Global variable
 let InitialNumOfBooks = 25;
+let intervalChangePagesReadMs = 200;
+let timeoutResizeMs = 500;
 
 let simplifiedStatesOfRead = ['not read yet', 'reading','read'];
 let statesOfRead = ['not read yet', 'just started', 'halfway through', 'almost finished','read'];
@@ -40,7 +42,7 @@ function checkOverflow(el)
 
 /* Book Constructor --------------------------------------- */
 
-function Book(pagesRead, title, author, pages, genre='-', year='-') {
+function Book(title, author, pages, genre='-', year='-', pagesRead=0) {
     this.title = title;
     this.author = author;
     this.genre = genre;
@@ -156,7 +158,7 @@ Library.prototype.printInfo = function () {
 }
 
 Library.prototype.addBook = function (book) {
-    // If the book is already in the library, ignore the request // XXXTOFIXXXX
+    // If the book is already in the library, ignore the request // XXXTOFIXXXX todo
     if (this.books.includes(book)) {
         return;
     }
@@ -272,7 +274,7 @@ Library.prototype.search = function (str,properties=['title','author']) {
 
     //console.table(this.books.filter(itm => itm.matched));
 
-    // Update the displayed order
+    // Update the displayed books
     this.books.map((itm) => {
         if (!itm.matched)
             itm.bookBoxDiv.classList.add('unmatched');
@@ -544,11 +546,11 @@ function createNewBookBox(newBook){
 
     bookPagesSection_div_btn1.addEventListener('pointerdown',startDecreaseReadPages_callback);
     bookPagesSection_div_btn1.addEventListener('pointerup',stopChangeReadPages_callback);
-    bookPagesSection_div_btn1.addEventListener('pointerout',stopChangeReadPages_callback);
+    bookPagesSection_div_btn1.addEventListener('pointerleave',stopChangeReadPagesOnLeave_callback);
 
     bookPagesSection_div_btn2.addEventListener('pointerdown',startIncreaseReadPages_callback);
     bookPagesSection_div_btn2.addEventListener('pointerup',stopChangeReadPages_callback);
-    bookPagesSection_div_btn2.addEventListener('pointerout',stopChangeReadPages_callback);
+    bookPagesSection_div_btn2.addEventListener('pointerleave',stopChangeReadPagesOnLeave_callback);
 
     /* ***** */
     likeToggle.bookBoxDiv = bookBox;  
@@ -699,6 +701,65 @@ function fitFontSize(elem, defaultFontSize='',delta=0.9){
     }
 }
 
+function toggleFavouriteBook(bookBoxDiv){
+    bookBoxDiv.book.favourite = bookBoxDiv.classList.toggle('favourite');
+}
+
+/* Get / set book data in form */
+
+function getRandomSampleBook(i){
+    // Take the i-th book from sampleBooks
+    // if i is not specified or out of bound, get a random one
+    let N = sampleBooks.length;
+    if (i==undefined || i >= N)
+       i = randomInt(0,N-1);
+    
+    let bookData = sampleBooks[i];
+    
+    // sampleBooks is a formatted array: the info in each item are in a specific order:
+    // [title,author,pages,genre,year]
+    // Here sampleBooks is just hardcoded...in general you could retrieve it from a database or csv file
+     let title  = bookData[0];
+     let author = bookData[1];
+     
+     let genre  = bookData[3];
+     let year   = bookData[4];
+     
+     // Generate a random simplified state: 'not read yet' or 'reading' or 'read'
+     // if the state is reading, generate a more specific state by generating a random nmber of pages read
+     let pages  = bookData[2];
+     let simplifiedState =  randomInt(0,2);
+     let pagesRead =  simplifiedState==0? 0 : simplifiedState==1? randomInt(1,pages-1) : pages;
+  
+    return [...bookData,pagesRead];
+ }
+
+ function getBookFromForm(){
+    // Get the data (todo)
+    let title = 'Hello';
+    let author = 'World';
+    let pages = '52';
+    let genre = 'What?';
+    let year = 1234;
+    let pagesRead = 1;
+  
+    return [title,author,pages,genre,year,pagesRead];
+}
+
+function addNewBookToLibrary(bookDataArray){
+    // Create a new book and add it to the library
+    let book = new Book(...bookDataArray);
+    myLibrary.addBook(book);
+    
+    /* Add it to the DOM */
+    let bookBox = createNewBookBox(book);
+    book.setBookBoxDiv(bookBox);
+    updateBookInfo(bookBox,book);
+    booksContainer.appendChild(bookBox);
+
+    return bookBox;
+ }
+
 /* Buttons callbacks */
 function showModal_callback(e){
     e.target.associatedModal.showModal();
@@ -708,6 +769,22 @@ function closeModal_callback(e){
     e.target.associatedModal.close();
 }
 
+function newBookAddBtn_callback(e){
+
+    /* Get the book data from the form and add it to the library */
+    addNewBookToLibrary(getBookFromForm());
+
+    adaptBookTitlesSize();
+    updateDisplayBooks();
+
+
+    // e.preventDefault(); // don't submit this form
+    e.target.associatedModal.close(); // Have to send the select box value here.
+    // clear the form data
+
+    console.table(myLibrary.books);
+ }
+
 
 function clearAll_callback(e){
     /* Delete all the childred and the descendants of book-container*/
@@ -716,6 +793,9 @@ function clearAll_callback(e){
     /* Delete the myLibrary object */
     /* remove all references to the object, which will be garbage collected later on*/
     myLibrary = undefined;
+
+    /* Init a new library*/
+    myLibrary = new Library();
 
     // Close the modal
     e.target.associatedModal.close();
@@ -765,7 +845,7 @@ function startDecreaseReadPages_callback(e){
     clearInterval(btn.interval);
     btn.interval = setInterval(function(e){
         decreaseReadPages_callback(e);
-    }, 200, e);
+    }, intervalChangePagesReadMs, e);
 }
 function startIncreaseReadPages_callback(e){
     let btn = e.target;
@@ -773,17 +853,22 @@ function startIncreaseReadPages_callback(e){
     clearInterval(btn.interval);
     btn.interval = setInterval(function(e){
         increaseReadPages_callback(e);
-    }, 200, e);
+    }, intervalChangePagesReadMs, e);
 }
 function stopChangeReadPages_callback(e){
     let btn = e.target;
     clearInterval(btn.interval);
     updateDisplayBooks();
 }
+function stopChangeReadPagesOnLeave_callback(e){
+    // ignore if it is a simple hover
+    if (e.buttons>0 || e.pointerType !="mouse")
+        stopChangeReadPages_callback(e)
+}
 
 function likeToggle_callback(e){
     let elem = e.target;
-    elem.bookBoxDiv.book.favourite = elem.bookBoxDiv.classList.toggle('favourite');
+    toggleFavouriteBook(elem.bookBoxDiv)
     updateDisplayBooks()
 }
 
@@ -794,7 +879,7 @@ function adaptBookTitlesSizeResize_callback(){
     clearTimeout(window.resizedFinished);
     window.resizedFinished = setTimeout(function(){
         adaptBookTitlesSize();
-    }, 200);
+    }, timeoutResizeMs);
 }
 
 /* Display settings */
@@ -803,7 +888,7 @@ function sortBooks(){
     //  - the method of sorting changes
     //  - a new book is added (todo)
     //  - the state / favourite changes (todo)
-    myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend)
+    myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend);
 }
 
 function searchBooks(){
@@ -924,27 +1009,16 @@ function getCheckedRadioValueAmongDescendants(ascendentElement){
 
 /* Get template data --------------------------------------- */
 
-function initRandomLibrary(library,numOfBooks){ // library is an object, passed by reference
+function initRandomLibrary(numOfBooks){ // library is an object, passed by reference
     currentId = -1;
 
     for (let i=0; i<numOfBooks; i++){
-        let bookData = sampleBooks[i];
-        /* generate a random simplified state: 'not read yet' or 'reading' or 'read' */
-        /* if the state is reading, generate a more specific state by generating a random nmber of pages read */
-        let simplifiedState =  randomInt(0,2);
-        let pagesRead =  simplifiedState==0? 0 : simplifiedState==1? randomInt(1,bookData[2]-1) : bookData[2];
-        let book = new Book(pagesRead,...bookData);
-        library.addBook(book);
-
-        /* Add it to the DOM */
-        let bookBox = createNewBookBox(book);
-        book.setBookBoxDiv(bookBox);
-        updateBookInfo(bookBox,book);
-        booksContainer.appendChild(bookBox);
+        /* Generate a random book and add it to the library */
+        let bookBox = addNewBookToLibrary(getRandomSampleBook(i));
 
         /* Randomly set is as favourite */
         if (randomInt(0,1))
-            book.favourite = bookBox.classList.toggle('favourite');
+            toggleFavouriteBook(bookBox)
     }
 }
 
@@ -978,7 +1052,7 @@ function initInterface(){
     clearAllCancelBtn.addEventListener('click',closeModal_callback);
 
     //newBookSuggestBtn.addEventListener('click',newBookSuggest_callback); /* TODO */
-    //newBookAddBtn.addEventListener('click',newBookAdd_callback); /* TODO */  
+    newBookAddBtn.addEventListener('click',newBookAddBtn_callback); 
     clearAllYesBtn.addEventListener('click',clearAll_callback);
 
     /* dialog for deleteThisBook functionality*/
@@ -1077,6 +1151,6 @@ let booksContainer = document.querySelector(".books-container");
 let displaySettings = new DisplaySettings();
 
 let myLibrary = new Library();
-initRandomLibrary(myLibrary,InitialNumOfBooks);
+initRandomLibrary(InitialNumOfBooks);
 initInterface();
 //myLibrary.printInfo();
