@@ -229,6 +229,10 @@ a:visited{
     text-decoration: none;
 }
 
+label{
+    user-select: none;
+}
+
 body {
     margin: 0 auto;
     min-height: 100vh;

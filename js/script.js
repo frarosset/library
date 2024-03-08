@@ -767,27 +767,174 @@ function addNewBookToLibrary(bookDataArray){
     return bookBox;
  }
 
-function newBookFormDOM(){
-    this.title = document.querySelector('#new-book-title');
-    this.author = document.querySelector('#new-book-author');
-    
-    this.pages = document.querySelector('#new-book-pages');
-    this.genre = document.querySelector('#new-book-genre');
+function NewBookFormDataDOM(){
+    this.titleInput = document.querySelector('#new-book-title');
+    this.authorInput = document.querySelector('#new-book-author');
+    this.genreInput = document.querySelector('#new-book-genre');
+    this.yearInput = document.querySelector('#new-book-year');
 
-    this.year = document.querySelector('#new-book-year');
-    this.pagesRead = document.querySelector('#new-book-pagesread');
+    // Update the maximum value of the year to the current year
+    this.yearInput.max = new Date().getFullYear();
+
+    // Add new book form callbacks
+
+    this.newBookStateFieldSet = document.querySelector('#new-book-state-fieldset');
+    this.newBookStateFieldSetRadios = [
+        document.querySelector('#new-book-state-fieldset input[type="radio"][value="0"]'),
+        document.querySelector('#new-book-state-fieldset input[type="radio"][value="1"]'),
+        document.querySelector('#new-book-state-fieldset input[type="radio"][value="2"]')];
+    this.newBookPagesInput = document.querySelector('#new-book-pages');
+    this.newBookPagesReadInput = document.querySelector('#new-book-pagesread');
+
+    // You have to bind the callback to this object, otherwise when calling the callback, 'this' will refer to the event object e
+    this.newBookStateFieldSet.addEventListener('change',this.newBookStateFieldSetChange_callback.bind(this));
+    this.newBookStateFieldSet.addEventListener('click',this.newBookStateFieldSetClick_callback.bind(this));
+    this.newBookPagesInput.addEventListener('input',this.newBookPagesInputChange_callback.bind(this));
+    this.newBookPagesReadInput.addEventListener('input',this.newBookPagesReadInputChange_callback.bind(this));
+
+    // Init these values
+    this.getValidPagesAndSimplifiedState();
+    this.stateUserSelected = false;
 }
 
-newBookFormDOM.prototype.getBookFromForm = function(){
+NewBookFormDataDOM.prototype.getBookFromForm = function(){
     // Get the data (todo)
-    let title       = this.title.value;
-    let author      = this.author.value;
-    let pages       = parseInt(this.pages.value);
-    let genre       = this.genre.value;
-    let year        = parseInt(this.year.value);
-    let pagesRead   = parseInt(this.pagesRead.value);
+    let title       = this.titleInput.value;
+    let author      = this.authorInput.value;
+    let pages       = this.pages;
+    let genre       = this.genreInput.value;
+    let year        = parseInt(this.yearInput.value);
+    let pagesRead   = this.pagesRead;
   
     return [title,author,pages,genre,year,pagesRead];
+};
+
+NewBookFormDataDOM.prototype.getValidPagesAndSimplifiedState = function(modPages=false,modPagesRead=false){
+    // Get the number of pages and check if it is valid (= not NaN)
+    this.pages =  parseInt(this.newBookPagesInput.value);
+    this.validPages = (this.pages === this.pages); // false if it is NaN
+    // If the number of pages is not a number or non-positive, cancel the input
+    if (!this.validPages || this.pages<=0){
+        this.pages = NaN;
+        this.newBookPagesInput.value = '';
+        this.validPages = false;
+    } else {
+        // This cancels the possible decimal point, removed by parseInt
+        // If this value has been modified by the user,
+        // the cursor is set at the end of the input, in the following way
+        // see this.selectionStart = this.selectionEnd = this.value.length;
+        if (modPages){
+            this.newBookPagesInput.focus();
+            this.newBookPagesInput.value = '';
+        }
+        this.newBookPagesInput.value = this.pages;
+    }
+
+    // Get the number of pages read and check if it is valid (= not NaN)
+    this.pagesRead =  parseInt(this.newBookPagesReadInput.value);
+    this.validPagesRead = (this.pagesRead === this.pagesRead); // false if it is NaN
+    // Now if it is valid and negative, set it to 0: if it is NaN, it remains NaN and the
+    // read pages field is reset
+    if (this.validPagesRead){
+        this.pagesRead =  Math.max(0,this.pagesRead);
+        // Again, if this value has been modified by the user,
+        // the cursor is set at the end of the input
+        if (modPagesRead){
+            this.newBookPagesReadInput.focus();
+            this.newBookPagesReadInput.value = '';
+        }
+        this.newBookPagesReadInput.value = this.pagesRead; 
+    } else { // not valid
+        this.pagesRead = NaN;
+        this.newBookPagesReadInput.value = '';
+        this.validPagesRead = false;
+    }
+
+
+    let simplifiedState;
+
+    if (this.pagesRead == 0)
+        // If the number of read pages is 0, the simplified state is 0
+        simplifiedState = 0;
+    else if (this.stateUserSelected && modPages){
+        // If the user has explicitly selected the 'read' state (clicked on it), 
+        // the pages read field is set to be equal to the pages field
+        this.pagesRead = this.pages;
+        this.newBookPagesReadInput.value = this.newBookPagesInput.value;
+        this.validPagesRead = true;
+        return;
+    } else if (this.validPages &&  this.validPagesRead){
+        // Both fields are valid.
+        // If the read pages are in range, highlight the proper status
+        if (this.pagesRead <= this.pages){
+            simplifiedState = (this.pagesRead < this.pages) ? 1 : 2;
+        } else { // else hide the status [(*)] 
+            this.newBookStateFieldSetRadios.map(radio => {radio.checked = false;});
+            return;
+        }
+    } else if (!this.validPagesRead){
+        // If the pages read is invalid, show the reading state
+        simplifiedState = 1;
+    } else {
+        // Here the number of pages is invalid, and the number of read pages is valid
+        // It's like the case (*) reported above
+        this.newBookStateFieldSetRadios.map(radio => {radio.checked = false;});
+        return;
+    }
+    this.newBookStateFieldSetRadios[simplifiedState].checked = true;
+};
+
+NewBookFormDataDOM.prototype.getMaxPagesRead = function(e){
+    // Set the maximum value for the read pages, based on the number of pages
+    // Use the maximum possible if the pages is not a valid number
+    this.newBookPagesReadInput.max = this.validPages ? this.pages : this.newBookPagesInput.max;
+};
+
+NewBookFormDataDOM.prototype.newBookStateFieldSetClick_callback = function(e){
+    // By setting this, when changing the number of pages, the number of read pages changes, too
+    // if the state is 'read' 
+    if (e.target.value==2)
+        this.stateUserSelected = true;
+    else
+        this.stateUserSelected = false;
+};
+
+NewBookFormDataDOM.prototype.newBookStateFieldSetChange_callback = function(e){
+    let simplifiedState = e.target.value;
+
+    if (simplifiedState == 0){
+        // if the user selects the 'not read' state, set the number of read pages to 0
+        this.pagesRead = 0;
+        this.newBookPagesReadInput.value = 0;
+        this.validPagesRead = true;
+        // Disable the read pages input
+        this.newBookPagesReadInput.disabled = true;
+    } else if (simplifiedState == 2) {
+        // if the user selects the 'read' state, set the number of read pages to the number of pages,
+        // note that if the pages field is empty, the read pages is set to empty, too
+        this.pagesRead = this.pages;
+        this.newBookPagesReadInput.value = this.newBookPagesInput.value;
+        this.validPagesRead = this.validPages;
+        // Disable the read pages input
+        this.newBookPagesReadInput.disabled = true;
+    } else if (!(this.validPages && (this.pagesRead < this.pages && this.pagesRead>0))){
+        // when the state is 'reading', reset the number of read pages if it is invalid/out of range 
+        this.pagesRead = NaN;
+        this.newBookPagesReadInput.value = '';
+        this.validPagesRead = false;
+        // Enable the read pages input
+        this.newBookPagesReadInput.disabled = false;
+    }
+};
+
+NewBookFormDataDOM.prototype.newBookPagesReadInputChange_callback = function(e){
+    this.getValidPagesAndSimplifiedState(false,true);
+};
+
+NewBookFormDataDOM.prototype.newBookPagesInputChange_callback = function(e){
+    this.getValidPagesAndSimplifiedState(true,false);
+    // Update the maximum value for the ReadPages based on the value of the pages
+    this.getMaxPagesRead();
 };
  
 
@@ -809,10 +956,6 @@ function newBookAddSubmit_callback(e){
     // cancels the form submission
     // not needed with method='dialog' on form
     // e.preventDefault();
-
-    // Additional validation
-    //todo
-
 
     /* Get the book data from the form and add it to the library */
     addNewBookToLibrary(newBookFormDataDOM.getBookFromForm());
@@ -1192,7 +1335,7 @@ const sampleBooks = [
 
 /* Initialization + Testing code */
 let booksContainer = document.querySelector(".books-container");
-let newBookFormDataDOM = new newBookFormDOM();
+let newBookFormDataDOM = new NewBookFormDataDOM();
 let displaySettings = new DisplaySettings();
 
 let myLibrary = new Library();

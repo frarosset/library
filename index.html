@@ -43,11 +43,11 @@
                     <label for="new-book-year">Year</label>
                 </div>
                 <fieldset id="new-book-state-fieldset">
-                    <input type="radio" id="notread" name="state" checked>
+                    <input type="radio" id="notread" value="0" name="state" checked>
                     <label for="notread">Not read</label>
-                    <input type="radio" id="reading" name="state">
+                    <input type="radio" id="reading" value="1" name="state">
                     <label for="reading">Reading</label>
-                    <input type="radio" id="read" name="state">
+                    <input type="radio" id="read" value="2" name="state">
                     <label for="read">Read</label>
                 </fieldset>
                 <div id="new-book-pages-div" class="input-field">
@@ -55,7 +55,7 @@
                     <label for="new-book-pages">Total pages</label>
                 </div>
                 <div id="new-book-pagesread-div" class="input-field">
-                    <input id="new-book-pagesread" name="pagesread" type="number" min="0" max="8000" step="1" value="0">
+                    <input id="new-book-pagesread" name="pagesread" type="number" min="0" max="8000" step="1" value="0" required disabled> <!-- it is enabled via js when changing the state -->
                     <label for="new-book-pagesread">Pages read</label>
                 </div>
             </form>
