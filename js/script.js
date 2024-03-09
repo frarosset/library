@@ -2,6 +2,7 @@ let currentId; // Global variable
 let InitialNumOfBooks = 25;
 let intervalChangePagesReadMs = 200;
 let timeoutResizeMs = 500;
+let timeoutScrollMs = 200;
 
 let simplifiedStatesOfRead = ['not read yet', 'reading','read'];
 let statesOfRead = ['not read yet', 'just started', 'halfway through', 'almost finished','read'];
@@ -38,6 +39,22 @@ function checkOverflow(el)
    el.style.overflow = curOverflow;
 
    return isOverflowing;
+}
+
+// throttle function to avoid calling the actual callback continuously (eg, on resize or scroll)
+// from: https://stackoverflow.com/questions/68751736/throttle-window-scroll-event-in-react-with-settimeout
+function throttle (callbackFn, limit=100) {
+    let wait = false;                  
+    return function () {              
+        if (!wait) {                  
+            callbackFn.call();           
+            wait = true;               
+            setTimeout(function () {
+                callbackFn.call();
+                wait = false;          
+            }, limit);
+        }
+    }
 }
 
 /* Book Constructor --------------------------------------- */
@@ -1076,12 +1093,12 @@ function likeToggle_callback(e){
 
 function adaptBookTitlesSizeResize_callback(){
     // wait some time before calling the actual resize function,
-    // to avoid calling it multiple times
-    // see https://stackoverflow.com/a/27923937
-    clearTimeout(window.resizedFinished);
-    window.resizedFinished = setTimeout(function(){
+    // // to avoid calling it multiple times
+    // // see https://stackoverflow.com/a/27923937
+    // clearTimeout(window.resizedFinished);
+    // window.resizedFinished = setTimeout(function(){
         adaptBookTitlesSize();
-    }, timeoutResizeMs);
+    // }, timeoutResizeMs);
 }
 
 /* Display settings */
@@ -1155,9 +1172,43 @@ function displaySettingViewInfo_callback(e){
     booksContainer.classList.toggle('view-text');
 }
 
+function displaySettingScroll_callback(e){
+    let booksContainerOffsetTop = booksContainer.offsetTop;
+    let scrollPos = window.scrollY;
+
+    /* Ignore if the scroll is not registered*/
+    if (displaySettings.prevScrollPos == scrollPos)
+        return;
+
+    if (scrollPos > booksContainerOffsetTop){
+        /* Set the top length after which the displaySettingsSticky sticks.*/
+        /* --settings-top is a CSS variable defined in styles.css */
+        displaySettings.displaySettingsSticky.style.top = 'var(--settings-top)';
+
+        /* Set the .pinned class when the position is actually sticked: here any positive scroll position indicates this */
+        /* A shadow is added to the pinned div */
+        displaySettings.displaySettingsSticky.classList.toggle("pinned", scrollPos > 0);
+
+        /* Set the .hide class when scrolling down (except the scroll at the beginning) */
+        displaySettings.displaySettingsSticky.classList.toggle("hide",displaySettings.prevScrollPos <= scrollPos && scrollPos > booksContainerOffsetTop);
+    } else {
+        /* This actually makes the displaySettingsSticky static: scroll down normally initially */
+        displaySettings.displaySettingsSticky.style.top = '-100%';
+        displaySettings.displaySettingsSticky.classList.remove("pinned");
+        displaySettings.displaySettingsSticky.classList.remove("hide");
+    }
+
+    /* Update the previous scroll posiiton */
+    displaySettings.prevScrollPos = scrollPos;
+}
+
 /* Display settings object */
 
 function DisplaySettings(){
+    this.displaySettingsSticky = document.querySelector(".display-settings");
+    this.prevScrollPos = window.scrollY;
+
+    window.addEventListener("scroll",throttle(displaySettingScroll_callback,timeoutScrollMs));
 
     let displaySettingOrderby = document.querySelector("#display-setting-orderby");
     this.orderBy = displaySettingOrderby.value;
@@ -1273,7 +1324,7 @@ function initInterface(){
     deleteThisBookYesBtn.addEventListener('click',deleteThisBook_callback);
 
     /* Re-fit book titles sizes when resizing the window */
-    window.addEventListener('resize',adaptBookTitlesSizeResize_callback);
+    window.addEventListener('resize',throttle(adaptBookTitlesSizeResize_callback,timeoutResizeMs));
 
     /* Display settings */
     let displaySettingOrderby = document.querySelector("#display-setting-orderby");
@@ -1334,7 +1385,7 @@ const sampleBooks = [
     ['The Adventures of Sherlock Holmes', 'A.C. Doyle', 307, 'Detective', 1891],
     ['The Memoirs of Sherlock Holmes', 'A.C. Doyle', 279, 'Detective', 1892],
     ['The Return of Sherlock Holmes', 'A.C. Doyle', 403, 'Detective', 1903],
-    ['His Last Bow: Some Later Reminiscences of Sherlock Holmes', 305, 'Detective', 1917],
+    ['His Last Bow: Some Later Reminiscences of Sherlock Holmes', 'A.C. Doyle', 305, 'Detective', 1917],
     ['The Case-Book of Sherlock Holmes', 'T.H. White', 320, 'Detective', 1927],
 
     ['The Neverending Story', 'M. Ende', 528, 'Fantasy', 1979],

@@ -84,7 +84,7 @@
     --book-author-fontsize:     1.05rem;
     --book-data-fontsize:       1.5rem;
     --book-data-lbl-fontsize:   1rem;
-    --book-pages-read-fontsize: 0.7em;
+    --book-pages-read-fontsize: 1.2rem;
     --book-state-fontsize:      30px;
     --book-addedon-fontsize:    0.8rem;
     --book-addedon-var-fontsize: 0.9rem;
@@ -104,16 +104,18 @@
     --dialog-padding:       20px;
     --dialog-border-width:  3px;
     --dialog-gap:           1.5rem;
-    --dialog-btn-height:    2.2em;
-    --dialog-btn-width:     5em;
+    --dialog-btn-height:    3rem;
+    --dialog-btn-width:     5rem;
     --dialog-btn-gap:       10px;
     --dialog-btn-border-width:2px;
     --dialog-form-gap: calc(var(--dialog-gap) / 2) calc(var(--dialog-gap));
     --dialog-form-radius: calc(var(--radius) / 2);
 
-    --hdr-padding:          10px 25px;
-    --hdr-btn-height:       4em;
-    --hdr-btn-width:        4em;
+    --hdr-padding-tb:       10px;
+    --hdr-padding-lr:       25px;
+    --hdr-padding:          var(--hdr-padding-tb) var(--hdr-padding-lr);
+    --hdr-btn-height:       3.5rem;
+    --hdr-btn-width:        3.5rem;
     --hdr-btn-gap:          6px;
     --hdr-btn-icon-len:     1.8rem;
     --hdr-btn-border-width: 2px;
@@ -139,8 +141,8 @@
     --book-footer-icon-gap: 0.4rem;
     --book-footer-icon-len:  min(2rem, 24px);;
 
-    --book-page-btn-height: 2em;
-    --book-page-btn-width:  3em;
+    --book-page-btn-height: 2rem;
+    --book-page-btn-width:  3rem;
 
     --book-title-height: calc(var(--book-title-fontsize) * var(--txt-lineheight) * var(--book-title-rows)
                             + 2 * var(--book-box-padding));
@@ -155,8 +157,7 @@
     --book-box-height: calc(var(--book-title-height) + var(--book-author-height) + var(--book-data-height) + var(--book-footer-height));
 
     /* settings */
-    --display-settings-padding-bottom:  30px;
-    --display-settings-gap:             1em;
+    --display-settings-gap:             0.8rem;
 
     --display-settings-label-fontsize:  1rem;
     --display-settings-fontsize:        1.2rem;
@@ -346,6 +347,7 @@ button.btn-highlight .icon::before{
 header{
     background-color: var(--hdr-bg-col);
     box-shadow: var(--outset-shadow-below);
+    position: -webkit-sticky;
     position: sticky;
     top: 0;
     z-index: 10;
@@ -395,16 +397,13 @@ main{
     flex: 1;
 }
 
-.main-container{
-    padding: var(--main-padding);
-}
-
 /* || Books container */
 .books-container{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(var(--book-box-max-width),100%),1fr));
     gap: var(--books-container-gap);
     justify-content: stretch;
+    padding: var(--main-padding);
 }
 
 
@@ -949,7 +948,11 @@ fieldset input:checked+label{
 /* || Display settings */
 
 .display-settings{
-    padding-bottom: var(--display-settings-padding-bottom);
+    --settings-top: calc(2 * var(--hdr-padding-tb) + max(var(--hdr-btn-height), var(--txt-lineheight) * var(--hdr-fontsize)) );
+    --settings-translateY: calc(-1 * 100% - var(--settings-top));
+    background-color: var(--bg-col);
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding:  var(--main-padding);
     display: grid;
     grid-template-columns: 1fr min-content;
     grid-template-areas:
@@ -958,6 +961,20 @@ fieldset input:checked+label{
     gap: var(--display-settings-gap);
     user-select: none;
     align-items: end;
+
+    position: -webkit-sticky;
+    position: sticky;
+    top: var(--settings-top);
+    z-index: 9;
+    transition: var(--transition-time);
+    transform: translateY(0);
+}
+.display-settings.hide{ /* when scrolling down */
+    transform: translateY(var(--settings-translateY));
+}
+
+.display-settings.pinned{ /* when it does not behave like static, ie when some scroll is applied wrt to the top */
+    box-shadow: var(--outset-shadow-below);
 }
 
 .display-setting{
