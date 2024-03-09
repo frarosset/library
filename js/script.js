@@ -427,7 +427,7 @@ function createNewBookBox(newBook){
     bookBox.classList.add('book-box');
 
     /* Generate an unique background (here use a lorem ipsum image)*/
-    bookBox.style.backgroundImage= `url('https://picsum.photos/400/500?random=${newBook.id}')`;
+    bookBox.style.backgroundImage= `url('https://picsum.photos/400/500?random=${newBook.id}'),  url('img/fallback-book-cover.jpg')`;
 
     /* title section -------------------------------------- */
     let bookHeaderSection = document.createElement('div');
