@@ -944,6 +944,11 @@ fieldset input:checked+label{
     flex: 3;
 }
 
+.dialog-description-book-already-in{
+    color: var(--col-highlight);
+    font-weight: bold;
+    transform: scale(0);
+}
 
 /* || Display settings */
 

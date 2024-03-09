@@ -174,14 +174,21 @@ Library.prototype.printInfo = function () {
     console.log(this.info())
 }
 
+Library.prototype.bookAlreadyInLibrary = function (book) {
+    return this.books.some(itm => (book.title == itm.title && book.author == itm.author && book.pages == itm.pages 
+                && book.genre == itm.genre && book.year == itm.year));
+}
+
 Library.prototype.addBook = function (book) {
-    // If the book is already in the library, ignore the request // XXXTOFIXXXX todo
-    if (this.books.includes(book)) {
-        return;
+    // The return is true if the book is added to the library, false if it is already present
+    // If the book is already in the library, ignore the request
+    if (this.bookAlreadyInLibrary(book)) {
+        return false;
     }
 
     // Update the library array
     this.books.push(book);
+    return true;
 }
 
 Library.prototype.deleteBook = function (book) {
@@ -773,8 +780,12 @@ function getRandomSampleBook(i){
 function addNewBookToLibrary(bookDataArray){
     // Create a new book and add it to the library
     let book = new Book(...bookDataArray);
-    myLibrary.addBook(book);
-    
+
+    // Return an undefined if the book is not added because it is already present in the library
+    if (!myLibrary.addBook(book)){
+        return undefined;
+    }
+
     /* Add it to the DOM */
     let bookBox = createNewBookBox(book);
     book.setBookBoxDiv(bookBox);
@@ -812,6 +823,9 @@ function NewBookFormDataDOM(){
     // Init these values
     this.getValidPagesAndSimplifiedState();
     this.readStateUserSelected = false;
+
+    // Div with the text to show if the book to add is already present
+    this.bookAlreadyInDiv = document.querySelector('.dialog-description-book-already-in')
 }
 
 NewBookFormDataDOM.prototype.getBookFromForm = function(){
@@ -990,8 +1004,21 @@ function newBookAddSubmit_callback(e){
     // not needed with method='dialog' on form
     // e.preventDefault();
 
-    /* Get the book data from the form and add it to the library */
-    addNewBookToLibrary(newBookFormDataDOM.getBookFromForm());
+    /* Get the book data from the form and add it to the library, if not already present
+       ie, if  addNewBookToLibrary does not return undefined */
+     
+    let bookBox = addNewBookToLibrary(newBookFormDataDOM.getBookFromForm());
+    if (bookBox){
+        newBookFormDataDOM.bookAlreadyInDiv.style.transform = 'scale(0)';
+    } else {
+        newBookFormDataDOM.bookAlreadyInDiv.style.transform= 'scale(1)';
+
+        // Set a timeout to hide the message again, and don't close/reset the form
+        clearTimeout(newBookFormDataDOM.bookAlreadyInTimeout);
+        newBookFormDataDOM.bookAlreadyInTimeout = setTimeout(() => {newBookFormDataDOM.bookAlreadyInDiv.style.transform = 'scale(0)';}, 2000);
+        e.preventDefault();
+        return;
+    }
 
     adaptBookTitlesSize();
     updateDisplayBooks();
