@@ -12,9 +12,9 @@
     <dialog id="dialog-new-book">
         <div class="dialog-content">
             <p class="dialog-description">Add a new book! <span class="note">Fields with <span class="required-span">∗</span> are requried.</span></p>
-            <form method="dialog" class="dialog-form" id="add-new-book-form">
+            <form method="dialog" class="dialog-form" id="add-new-book-form" autofocus>
                 <div id="new-book-title-div" class="input-field">
-                    <input id="new-book-title" name="title" type="text" maxlength="120" required autofocus>
+                    <input id="new-book-title" name="title" type="text" maxlength="120" required>
                     <label for="new-book-title">Title</label>
                 </div>
                 <div id="new-book-author-div" class="input-field">
@@ -64,7 +64,7 @@
                 <button class="cancel" value="no">Cancel</button>
                 <button class="suggest" value="suggest">Suggest a book</button>
                 <div class="flex-separator"></div>
-                <button class="add btn-highlight" type="submit" form="add-new-book-form" value="add" autofocus>Add</button>    
+                <button class="add btn-highlight" type="submit" form="add-new-book-form" value="add">Add</button>    
             </div>
         </div>
     </dialog>

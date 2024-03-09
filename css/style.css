@@ -429,6 +429,8 @@ main{
     background-repeat: no-repeat;
     background-position: center;
 
+    transition: all var(--transition-time);
+
     /* remove this: apparently, using mask: linear-gradient(...) and backdrop-filter: blur(...)  to dissolve the blur, */
     /* eg, in .book-header-section, does not work properly when there is overflow: hidden in a container */
     /* by removing the following overflow hidden the expected behaviour happens */
@@ -436,6 +438,11 @@ main{
     /* This is fixed later in the style for .book-footer-section, as it only involves that part */
     /* see https://stackoverflow.com/questions/76921302/backdrop-filter-in-combination-with-mask-image-doesnt-work-as-expected-on-chrom */
     /* overflow: hidden; */ 
+}
+
+.book-box.fitFontSizeTempShow{ /* it is used by jd function fitFontSize() in js/script.js to adapt fontsize container*/
+    display: grid !important; /*this must be the same as display in .book-title-section h2 */
+    visibility: visible !important;
 }
 
 .book-box.hide,

@@ -253,17 +253,38 @@ function attributeForFilter(property,...values){
     return {property: property, values: values};
 }
 
+Book.prototype.filterBy = function (...attributes) {
+    // attributes: array of {property: 'year', values: [1999,2009]]}: see function attributeForFilter()
+    // this function ASSUMES that each property is reported only once in attributes array
+    // a "" value is ignored
+
+    // The book to show contains all the attributes A,B,C,..: A and B and C ...
+    // Note: to get the items to hide, you would need: not(A) or not(B) or not(C) or ...
+
+    this.show = true;
+
+    attributes.map(attr =>{        
+        if (!attr.property in this|| attr.values.length==0 || attr.values=="")
+            return;
+
+        if (this.show && !attr.values.includes(this[attr.property]))
+            this.show = false;
+    });
+
+    // Update the displayed order
+    this.bookBoxDiv.classList.toggle('hide',!this.show);
+}
+
 Library.prototype.filterBy = function (...attributes) {
     // attributes: array of {property: 'year', values: [1999,2009]]}: see function attributeForFilter()
     // this function ASSUMES that each property is reported only once in attributes array
     // a "" value is ignored
+    // Similar to Book.prototype.filterBy, but applied to all the books in the library
+    // Note: altough the code is mostly repeated, common operations are performed only once, and not for each book.
+
     if (this.books.length==0)
         return;
 
-    // The books to show contains all the attributes A,B,C,..: A and B and C ...
-    // Note: to get the items to hide, you would need: not(A) or not(B) or not(C) or ...
-
-    // init the show status
     this.books.map(itm => itm.show = true);
 
     attributes.map(attr =>{        
@@ -276,18 +297,45 @@ Library.prototype.filterBy = function (...attributes) {
         });
     });
 
-    //console.table(this.books.filter(itm => itm.show));
-
     // Update the displayed order
     this.books.map((itm) => {
-        if (!itm.show)
-            itm.bookBoxDiv.classList.add('hide');
-        else
-            itm.bookBoxDiv.classList.remove('hide');
+        itm.bookBoxDiv.classList.toggle('hide',!itm.show);
     });
 }
 
+Book.prototype.search = function (str,properties=['title','author']) {
+    // a "" string is ignored
+
+    if (str==""){
+        this.matched = true;
+        this.bookBoxDiv.classList.remove('unmatched');
+        return;
+    }
+        
+    str = str.toLowerCase().trim();
+
+    // Search in all properties if these are not specified
+    if (properties.length==undefined || properties.length==0)
+        properties = Object.keys(myLibrary.books[0]);
+
+    // init the show status
+    this.matched = false;
+
+    properties.map(prop =>{        
+        if (!prop in this.books[0])
+            return;
+        if (!this.matched && this[prop].toString().toLowerCase().includes(str))
+            this.matched = true;
+    });
+
+    // Update the displayed books
+    this.bookBoxDiv.classList.toggle('unmatched',!this.matched);
+}
+
 Library.prototype.search = function (str,properties=['title','author']) {
+    // Similar to Book.prototype.search, but applied to all the books in the library
+    // Note: altough the code is mostly repeated, common operations are performed only once, and not for each book.
+
     // a "" string is ignored
     if (this.books.length==0)
         return;
@@ -321,17 +369,8 @@ Library.prototype.search = function (str,properties=['title','author']) {
 
     // Update the displayed books
     this.books.map((itm) => {
-        if (!itm.matched)
-            itm.bookBoxDiv.classList.add('unmatched');
-        else
-            itm.bookBoxDiv.classList.remove('unmatched');
+        itm.bookBoxDiv.classList.toggle('unmatched',!itm.matched);
     });
-}
-
-function updateDisplayBooks(){
-    sortBooks();
-    searchBooks();
-    filterBooks();
 }
 
 /* Book Box (DOM)*/
@@ -585,6 +624,7 @@ function createNewBookBox(newBook){
     bookBox.book = newBook;
     bookBox.readPagesDiv = bookPagesSection_div_var_read;
     bookBox.bookstateSvg = bookstateSvg;
+    bookBox.bookTitle    = bookTitleSection_h2;
 
     bookPagesSection_div_btn1.bookBoxDiv = bookBox;
     bookPagesSection_div_btn2.bookBoxDiv = bookBox;
@@ -725,12 +765,36 @@ function setBookstate(bookstateSvg,book){
     bookstateSvg.stateText.textContent = book.state;
 }
 
-function adaptBookTitlesSize(){
-    let defaultFontSize = window.getComputedStyle(document.documentElement).getPropertyValue('--book-title-fontsize');;
-    // ForEach book title section h2, check if the text overflows: in that case, scale down its size.
-    let bookTitleSection_divs = [...document.querySelectorAll(".book-title-section h2")];
-    bookTitleSection_divs.forEach((titleSection)=> {
-        fitFontSize(titleSection,defaultFontSize);
+function adaptBookTitleSize(bookBox){
+    let defaultFontSize = window.getComputedStyle(document.documentElement).getPropertyValue('--book-title-fontsize');
+
+    // Temporarly show the item if it is hidden or not displayed
+    // This is done applying a tempShow class, defined in the css file with:
+    //    display: initial !important; /*this must be the same as display in .elem visible style */
+    //    visibility: visible !important;
+    // Otherwise such elements would not be adapted, as their computed style would not be computed
+    bookBox.classList.add('fitFontSizeTempShow');
+
+    // check if the text overflows: in that case, scale down its size.
+    fitFontSize(bookBox.bookTitle,defaultFontSize);
+    
+    // Restore the initial show status
+    bookBox.classList.remove('fitFontSizeTempShow');
+}
+
+function adaptBooksTitleSizeInLibrary(){
+    // Same as adaptBookTitleSize, but for all elements.
+    // The defaultFontSize is computed only once, and not for each book, hence we don't call adaptBookTitleSize
+    let defaultFontSize = window.getComputedStyle(document.documentElement).getPropertyValue('--book-title-fontsize');
+    
+    myLibrary.books.forEach(book => {
+        let bookBox = book.bookBoxDiv;
+        bookBox.classList.add('fitFontSizeTempShow');
+
+        fitFontSize(bookBox.bookTitle,defaultFontSize);
+        
+        // Restore the initial show status
+        bookBox.classList.remove('fitFontSizeTempShow');
     });
 }
 
@@ -791,6 +855,12 @@ function addNewBookToLibrary(bookDataArray){
     book.setBookBoxDiv(bookBox);
     updateBookInfo(bookBox,book);
     booksContainer.appendChild(bookBox);
+
+    /* Adapt the title font size */
+    adaptBookTitleSize(bookBox);
+    /* and apply possible filters */
+    book.filterBy(...displaySettings.filterArg);
+    book.search(displaySettings.searchStr, displaySettings.searchInProperties);
 
     return bookBox;
  }
@@ -1020,8 +1090,7 @@ function newBookAddSubmit_callback(e){
         return;
     }
 
-    adaptBookTitlesSize();
-    updateDisplayBooks();
+    myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend);
 
     // Clear the form data
     e.target.reset();
@@ -1104,7 +1173,10 @@ function startIncreaseReadPages_callback(e){
 function stopChangeReadPages_callback(e){
     let btn = e.target;
     clearInterval(btn.interval);
-    updateDisplayBooks();
+    let thisBook = btn.bookBoxDiv.book;
+    thisBook.filterBy(...displaySettings.filterArg);
+    thisBook.search(displaySettings.searchStr, displaySettings.searchInProperties);
+    myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend);
 }
 function stopChangeReadPagesOnLeave_callback(e){
     // ignore if it is a simple hover
@@ -1115,83 +1187,49 @@ function stopChangeReadPagesOnLeave_callback(e){
 function likeToggle_callback(e){
     let elem = e.target;
     toggleFavouriteBook(elem.bookBoxDiv)
-    updateDisplayBooks()
-}
-
-function adaptBookTitlesSizeResize_callback(){
-    // wait some time before calling the actual resize function,
-    // // to avoid calling it multiple times
-    // // see https://stackoverflow.com/a/27923937
-    // clearTimeout(window.resizedFinished);
-    // window.resizedFinished = setTimeout(function(){
-        adaptBookTitlesSize();
-    // }, timeoutResizeMs);
-}
-
-/* Display settings */
-function sortBooks(){
-    // to be called when:
-    //  - the method of sorting changes
-    //  - a new book is added (todo)
-    //  - the state / favourite changes (todo)
+    let thisBook = elem.bookBoxDiv.book;
+    thisBook.filterBy(...displaySettings.filterArg);
+    thisBook.search(displaySettings.searchStr, displaySettings.searchInProperties);
     myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend);
 }
 
-function searchBooks(){
-    // to be called when:
-    //  - the search text changes
-    //  - a new book is added (todo)
-    //  - when a property to search in changes in a book 
-    //    (note: here this does not happens as we will only search in the title and author fixed fields)
-
-    // you can filter both because of the search field, and the explicit filters
-    myLibrary.search(displaySettings.search, displaySettings.searchInProperties);
+function windowResize_callback(){
+    adaptBooksTitleSizeInLibrary();
 }
 
-function filterBooks(){
-    // to be called when:
-    //  - a filter changes
-    //  - a new book is added (todo)
-    //  - when a property to filter changes in a book 
-
-    // you can filter both because of the search field, and the explicit filters
-    myLibrary.filterBy(...displaySettings.filterArg);
-}
+/* Display settings */
+// The sort / search / filter have to be updated when:
+//  - the method of sorting/searching/filtering changes [FOR THE ENTIRE LIBRARY]
+//  - a new book is added [search / filter: ONLY FOR THE NEW BOOK, sort: FOR THE ENTIRE LIBRARY]
+//  - the read pages or the favourite status changes [search / filter: ONLY FOR THE NEW BOOK, sort: FOR THE ENTIRE LIBRARY]
 
 function displaySettingOrderby_callback(e){
     displaySettings.orderBy = e.target.value;
-    sortBooks();
+    myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend);
 }
 
 function displaySettingOrderByDescend_callback(e){
     displaySettings.orderByDescend = e.target.classList.toggle('descend');
-    sortBooks();
+    myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend);
 }
 
 function displaySettingSearch_callback(e){
-    displaySettings.search = e.target.value;
-    searchBooks();
-    adaptBookTitlesSize();
+    displaySettings.searchStr = e.target.value;
+    myLibrary.search(displaySettings.searchStr, displaySettings.searchInProperties);
 }
 
 function displaySettingFilterFavourites_callback(e){
     displaySettings.getLogicValueFromStr('favourite', e.target.value);     
-    
     /* Update filter argument: trasform the properties of displaySettings.filter to an array (discarding the keys) */
     displaySettings.updateFilterArgInDisplaySettings();
-
-    filterBooks();
-    adaptBookTitlesSize();
+    myLibrary.filterBy(...displaySettings.filterArg);
 }
 
 function displaySettingFilterState_callback(e){
     displaySettings.getIntegerValueFromStr('simplifiedStateId', e.target.value);     
-    
     /* Update filter argument: trasform the properties of displaySettings.filter to an array (discarding the keys) */
     displaySettings.updateFilterArgInDisplaySettings();
-
-    filterBooks();
-    adaptBookTitlesSize();
+    myLibrary.filterBy(...displaySettings.filterArg);
 }
 
 function displaySettingViewInfo_callback(e){
@@ -1244,7 +1282,7 @@ function DisplaySettings(){
     this.orderByDescend = displaySettingOrderByDescend.classList.contains('descend');
 
     let displaySettingSearch = document.querySelector("#display-setting-search");
-    this.search = displaySettingSearch.value;
+    this.searchStr = displaySettingSearch.value;
 
     this.searchInProperties = ['title','author'];
 
@@ -1351,7 +1389,7 @@ function initInterface(){
     deleteThisBookYesBtn.addEventListener('click',deleteThisBook_callback);
 
     /* Re-fit book titles sizes when resizing the window */
-    window.addEventListener('resize',throttle(adaptBookTitlesSizeResize_callback,timeoutResizeMs));
+    window.addEventListener('resize',throttle(windowResize_callback,timeoutResizeMs));
 
     /* Display settings */
     let displaySettingOrderby = document.querySelector("#display-setting-orderby");
@@ -1371,9 +1409,8 @@ function initInterface(){
 
     let displaySettingViewInfo = document.querySelector("#display-setting-view-info-btn");
     displaySettingViewInfo.addEventListener('click', displaySettingViewInfo_callback);
-    
-    adaptBookTitlesSize();
-    updateDisplayBooks();
+  
+    myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend);
 }
 
 /* Some sample data --------------------------------------- */
