@@ -1092,6 +1092,21 @@ function newBookAddSubmit_callback(e){
 
     myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend);
 
+    /* Focus on the new element, if not filtered */
+    window.scrollBy({top: -window.scrollY,left: 0, behavior: "instant"});
+    if (!bookBox.classList.contains('hide') && !bookBox.classList.contains('unmatched')){
+        setTimeout(() => {
+            window.scrollBy({
+                top: bookBox.offsetTop - booksContainer.offsetTop,
+                left: 0,
+                behavior: "smooth"});
+                bookBox.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    bookBox.style.transform = 'scale(1)';
+                }, 500);    
+        }, 500); // wait some time so that the window has beeh sorted and scrolled up
+    }
+
     // Clear the form data
     e.target.reset();
 
@@ -1450,13 +1465,13 @@ const sampleBooks = [
     ['The Memoirs of Sherlock Holmes', 'A.C. Doyle', 279, 'Detective', 1892],
     ['The Return of Sherlock Holmes', 'A.C. Doyle', 403, 'Detective', 1903],
     ['His Last Bow: Some Later Reminiscences of Sherlock Holmes', 'A.C. Doyle', 305, 'Detective', 1917],
-    ['The Case-Book of Sherlock Holmes', 'T.H. White', 320, 'Detective', 1927],
+    ['The Case-Book of Sherlock Holmes', 'A.C. Doyle', 320, 'Detective', 1927],
 
     ['The Neverending Story', 'M. Ende', 528, 'Fantasy', 1979],
     ['The Wonderful Wizard of Oz', 'L.F. Baum', 244, 'Fantasy', 1900],
     ['Peter Pan', 'J.M. Barrie', 250, 'Fantasy', 1904],
-    ['Alice\'s Adventures in Wonderland', 'J.M. Barrie', 313, 'Fantasy', 1865],
-    ['Through the Looking-Glass', 'J.M. Barrie', 313, 'Fantasy', 1871],
+    ['Alice\'s Adventures in Wonderland', 'L. Carrol', 313, 'Fantasy', 1865],
+    ['Through the Looking-Glass', 'L. Carrol', 313, 'Fantasy', 1871],
     ['Matilda', 'R. Dahl', 40, 'Fantasy', 1988],
     ['Charlie and the Chocolate Factory', 'R. Dahl', 160, 'Fantasy', 1964],
     ['The Once and Future King', 'T.H. White', 864,'Fantasy',  1958],
