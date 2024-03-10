@@ -11,7 +11,7 @@
     --col-accent-light:  #e29f6e; /*#E4B363;*/
 
     --col-white-with-alpha: rgba(232, 233, 235, 0.2); /*#E8E9EB with alpha*/
-    --col-purewhite-with-alpha: rgba(255, 255, 255, 0.8); /*#ffffff with alpha*/
+    --col-purewhite-with-alpha: rgba(255, 255, 255, 0.2); /*#ffffff with alpha*/
     --col-black-with-alpha:rgba(49,54,56, 0.6); /*#313638 with alpha*/
     --col-transparent:    rgba(0, 0, 0, 0); 
 
@@ -43,8 +43,8 @@
     --dialog-label-color: var(--col-white);
     --dialog-label-focus-color: var(--col-grey);
 
-    --book-title-col:           var(--col-accent-light); /*var(--col-purewhite);*/
-    --book-author-col-secondary:var(--col-grey);
+    --book-title-col:           var(--col-purewhite-with-alpha); /*var(--col-purewhite);*/
+    --book-author-col-secondary:var(--col-purewhite-with-alpha);
     --book-author-col:          var(--col-purewhite);
     --book-data-col:            var(--col-accent-light);
     --book-data-lbl-col:        var(--col-grey);
@@ -62,7 +62,14 @@
     --book-page-btn-bg-col-hover:    var(--col-black-with-alpha);
     --book-page-btn-bg-col-active:   var(--col-grey);
 
-    /* Colors (icons)*/
+    /* Shadows */
+    --outset-shadow-center: 0px 0px 3px var(--col-black);
+    --outset-shadow-below: 0px 1px 5px var(--col-black);
+    --outset-shadow-top: 0px -1px 3px var(--col-black);
+    --title-txt-shadow: white 1px 1px 1px, var(--col-black-with-alpha) -1px 0px 1px, var(--col-black) 0px 0px 10px;
+    --author-txt-shadow: var(--col-black) 1px 1px 1px,var(--col-black) 0px 0px 10px;
+    --author-secondary-txt-shadow: var(--title-txt-shadow);
+    --data-txt-shadow: black 1px 1px 1px,var(--col-black) 0px 0px 10px;
 
     /* Font family */
     --main-font: 'Lato', sans-serif;
@@ -179,13 +186,6 @@
 
     /* Radius */
     --radius:           10px;
-
-    /* Shadows */
-    --outset-shadow-center: 0px 0px 3px var(--col-black);
-    --outset-shadow-below: 0px 1px 5px var(--col-black);
-    --outset-shadow-top: 0px -1px 3px var(--col-black);
-    --title-txt-shadow: var(--col-black) 0px 0px 3px;
-    --author-txt-shadow: var(--col-black) 0px 0px 3px;
 
     /* Animations on hover / active / ...*/
     --transition-time: 0.3s;
@@ -441,7 +441,7 @@ main{
 }
 
 .book-box.fitFontSizeTempShow{ /* it is used by jd function fitFontSize() in js/script.js to adapt fontsize container*/
-    display: grid !important; /*this must be the same as display in .book-title-section h2 */
+    display: grid !important; /*this must be the same as display in .book-box */
     visibility: visible !important;
 }
 
@@ -482,13 +482,13 @@ main{
 
     /* border: 2px solid var(--bg-col);
     border-bottom: none; */
-    background-image: linear-gradient(180deg, var(--col-black) 20%, var(--book-data-bg-col) 60%, var(--col-transparent));
+    background-image: linear-gradient(180deg, var(--col-black) 0%, var(--book-data-bg-col) 60%, var(--col-transparent));
     border-radius: var(--radius) var(--radius) 0  0;
 
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    mask: linear-gradient(#000 40%, #0000 100%);
-    -webkit-mask: linear-gradient(#000 40%, #0000 100%);
+    mask: linear-gradient(#000 0%, #0000 80%);
+    -webkit-mask: linear-gradient(#000 0%, #0000 80%);
 }
 
 .book-title-section{
@@ -527,12 +527,13 @@ main{
     font-size: var(--book-author-fontsize);
     text-align: right;
     color: var(--book-author-col-secondary);
-    text-shadow: var(--author-txt-shadow);
+    text-shadow: var(--author-secondary-txt-shadow);
 }
 
 .book-author-section .book-author .var-author{
     font-weight: bold;
     color: var(--book-author-col);
+    text-shadow: var(--author-txt-shadow);
 }
 
 /* Book box - image section */
@@ -583,6 +584,7 @@ main{
     font-weight: bold;
     font-size: var(--book-data-fontsize);
     color: var(--book-data-col);
+    text-shadow: var(--data-txt-shadow);
 }
 
 .book-genre{
