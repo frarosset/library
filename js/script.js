@@ -1,5 +1,5 @@
 let currentId; // Global variable
-let InitialNumOfBooks = 25;
+let InitialNumOfBooks = 12;
 let intervalChangePagesReadMs = 200;
 let timeoutResizeMs = 500;
 let timeoutScrollMs = 200;
@@ -1109,6 +1109,9 @@ function newBookAddSubmit_callback(e){
         return;
     }
 
+    // Reset the display filters and search
+    displaySettings.resetFilters();
+
     myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend);
 
     /* Focus on the new element, if not filtered */
@@ -1145,6 +1148,9 @@ function clearAll_callback(e){
 
     /* Init a new library*/
     myLibrary = new Library();
+
+    // Reset the display filters and search
+    displaySettings.resetFilters();
 
     // Close the modal
     e.target.associatedModal.close();
@@ -1315,24 +1321,43 @@ function DisplaySettings(){
     let displaySettingOrderByDescend = document.querySelector("#display-setting-orderby-descend-btn");
     this.orderByDescend = displaySettingOrderByDescend.classList.contains('descend');
 
-    let displaySettingSearch = document.querySelector("#display-setting-search");
-    this.searchStr = displaySettingSearch.value;
+    this.displaySettingSearch = document.querySelector("#display-setting-search");
+    this.searchStr = this.displaySettingSearch.value;
 
     this.searchInProperties = ['title','author'];
 
     this.filter = {};
 
     let displaySettingFilterFavourites = document.querySelector("#display-setting-filter-favourites");
+    this.displaySettingFilterFavouritesEmpty = displaySettingFilterFavourites.querySelector('#display-setting-filter-favourites-empty');
     let filterFavouritesValueStr = getCheckedRadioValueAmongDescendants(displaySettingFilterFavourites);
     this.getLogicValueFromStr('favourite', filterFavouritesValueStr);
 
     let displaySettingFilterState = document.querySelector("#display-setting-filter-state");
+    this.displaySettingFilterStateEmpty = displaySettingFilterState.querySelector('#display-setting-filter-state-empty');
     let filterStateValueStr = getCheckedRadioValueAmongDescendants(displaySettingFilterState);
     this.getIntegerValueFromStr('simplifiedStateId', filterStateValueStr);    
 
     this.updateFilterArgInDisplaySettings(); /* this sets .filterArg*/
 
 }
+
+DisplaySettings.prototype.resetFilters = function(property,str){
+    // Reset search
+    this.displaySettingSearch.value = '';
+    displaySettings.searchStr = this.displaySettingSearch.value;
+    myLibrary.search(displaySettings.searchStr, displaySettings.searchInProperties);
+
+    //Reset filter favourites and state
+    this.displaySettingFilterFavouritesEmpty.checked = true;
+    this.displaySettingFilterStateEmpty.checked = true;
+    displaySettings.getLogicValueFromStr('favourite', this.displaySettingFilterFavouritesEmpty.value);     
+    displaySettings.getIntegerValueFromStr('simplifiedStateId', this.displaySettingFilterStateEmpty.value);  
+
+    /* Update filter argument: trasform the properties of displaySettings.filter to an array (discarding the keys) */
+    displaySettings.updateFilterArgInDisplaySettings();
+    myLibrary.filterBy(...displaySettings.filterArg);
+};
 
 DisplaySettings.prototype.getLogicValueFromStr = function(property,str){
     if (str == "")
@@ -1363,10 +1388,12 @@ function getCheckedRadioValueAmongDescendants(ascendentElement){
 
 function initRandomLibrary(numOfBooks){ // library is an object, passed by reference
     currentId = -1;
-
+    numOfBooks = Math.min(numOfBooks,sampleBooks.length); /* get a random book */
     for (let i=0; i<numOfBooks; i++){
         /* Generate a random book and add it to the library */
-        let bookBox = addNewBookToLibrary(getRandomSampleBook(i));
+        // let bookBox = addNewBookToLibrary(getRandomSampleBook(i));
+        let bookBox; /* get a random book */
+        while (!(bookBox = addNewBookToLibrary(getRandomSampleBook()))); /* get a random book */
 
         /* Randomly set is as favourite */
         if (randomInt(0,1))
