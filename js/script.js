@@ -650,10 +650,15 @@ function createNewBookBox(newBook){
     which associates this book to the opened dialog. */
 
     let deleteThisBookDialog = document.querySelector("#dialog-delete-this-book");
-    let deleteThisBookYesBtn = document.querySelector("#dialog-delete-this-book button.yes");
+    let deleteThisBookYesBtn = deleteThisBookDialog.querySelector("button.yes");
+
+    deleteThisBookDialog.bookToDeleteTitle =deleteThisBookDialog.querySelector(".book-to-delete-title");
+    deleteThisBookDialog.bookToDeleteAuthor =deleteThisBookDialog.querySelector(".book-to-delete-author");
 
     deleteThisBook.associatedModal = deleteThisBookDialog;
     deleteThisBook.addEventListener('click',(e) => {
+        deleteThisBookDialog.bookToDeleteTitle.textContent = newBook.title;
+        deleteThisBookDialog.bookToDeleteAuthor.textContent = newBook.author;
         showModal_callback(e); 
         deleteThisBookYesBtn.bookBoxDiv = bookBox;
     });  

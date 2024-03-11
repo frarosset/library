@@ -8,7 +8,7 @@
     --col-grey:          #E0DFD5; /* RGB(224, 223, 213) */
     --col-black:         #313638;
     --col-accent-dark:   #EF6461;
-    --col-accent-light:  #e29f6e; /*#E4B363;*/
+    --col-accent-light:  #E4B363;  /*#e29f6e;;*/
 
     --col-white-with-alpha: rgba(232, 233, 235, 0.2); /*#E8E9EB with alpha*/
     --col-purewhite-with-alpha: rgba(255, 255, 255, 0.2); /*#ffffff with alpha*/
@@ -815,6 +815,18 @@ dialog{
     padding-right: var(--dialog-padding);
 }
 
+dialog#dialog-delete-this-book{
+    max-width: min(calc(var(--max-width) - 2 * var(--main-padding)), 768px) !important;
+}
+
+dialog#dialog-delete-this-book span{
+    font-weight: bold;
+    font-family: var(--highlight-font);
+}
+
+dialog#dialog-delete-this-book span.book-to-delete-title{
+    font-style: italic;
+}
 
 /* | Dialog new book */
 dialog#dialog-new-book{
