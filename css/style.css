@@ -67,7 +67,7 @@
     --outset-shadow-below: 0px 1px 5px var(--col-black);
     --outset-shadow-top: 0px -1px 3px var(--col-black);
     --title-txt-shadow: white 1px 1px 1px, var(--col-black-with-alpha) -1px 0px 1px, var(--col-black) 0px 0px 10px;
-    --author-txt-shadow: var(--col-black) 1px 1px 1px,var(--col-black) 0px 0px 10px;
+    --author-txt-shadow: var(--col-black-with-alpha) -1px 0px 2px, black 0px 0px 10px; /*var(--col-black) 1px 1px 1px,var(--col-black) 0px 0px 10px;*/
     --author-secondary-txt-shadow: var(--title-txt-shadow);
     --data-txt-shadow: black 1px 1px 1px,var(--col-black) 0px 0px 10px;
 

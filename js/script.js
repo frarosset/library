@@ -316,17 +316,23 @@ Book.prototype.search = function (str,properties=['title','author']) {
 
     // Search in all properties if these are not specified
     if (properties.length==undefined || properties.length==0)
-        properties = Object.keys(myLibrary.books[0]);
+        properties = Object.keys(this);
+    else
+        properties =properties.filter(itm => Object.keys(this).includes(itm));
 
     // init the show status
     this.matched = false;
 
-    properties.map(prop =>{        
-        if (!prop in this.books[0])
-            return;
-        if (!this.matched && this[prop].toString().toLowerCase().includes(str))
-            this.matched = true;
-    });
+    // Full string search (old version)
+    // properties.map(prop =>{
+    //     if (!this.matched && this[prop].toString().toLowerCase().includes(str))
+    //         this.matched = true;
+    // });
+    // For each word to search, at least a match must exist
+    let str_split = str.split(/\W+/);
+    this.matched = str_split.every(str =>
+        properties.some(prop => this[prop].toString().toLowerCase().includes(str))
+    );
 
     // Update the displayed books
     this.bookBoxDiv.classList.toggle('unmatched',!this.matched);
@@ -351,18 +357,26 @@ Library.prototype.search = function (str,properties=['title','author']) {
     str = str.toLowerCase().trim();
 
     if (properties.length==undefined || properties.length==0)
-        properties = Object.keys(myLibrary.books[0]);
+        propertiesproperties = Object.keys(this.books[0]);
+    else
+        properties = properties.filter(itm => Object.keys(this.books[0]).includes(itm));
 
     // init the show status
     this.books.map(itm => itm.matched = false);
 
-    properties.map(prop =>{        
-        if (!prop in this.books[0])
-            return;
-        this.books.map(itm => {
-            if (!itm.matched && itm[prop].toString().toLowerCase().includes(str))
-                itm.matched = true;
-        });
+    // Full string search (old version)
+    // properties.map(prop =>{        
+    //     this.books.map(itm => {
+    //         if (!itm.matched && itm[prop].toString().toLowerCase().includes(str))
+    //             itm.matched = true;
+    //     });
+    // });
+    // For each word to search, at least a match must exist
+    let str_split = str.split(/\W+/);
+    this.books.map(itm => {
+        itm.matched = str_split.every(str =>
+            properties.some(prop => itm[prop].toString().toLowerCase().includes(str))
+        );
     });
 
     //console.table(this.books.filter(itm => itm.matched));
