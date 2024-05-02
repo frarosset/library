@@ -4,9 +4,6 @@ let intervalChangePagesReadMs = 200;
 let timeoutResizeMs = 500;
 let timeoutScrollMs = 200;
 
-let simplifiedStatesOfRead = ['not read yet', 'reading','read'];
-let statesOfRead = ['not read yet', 'just started', 'halfway through', 'almost finished','read'];
-
 /* Generic function --------------------------------------- */
 function randomInt(min, max) {
     min = Math.ceil(min);
@@ -20,6 +17,12 @@ function removeDescendants(elem){
         elem.removeChild(elem.lastChild);
     }
 }
+
+function getClassGetters(className){
+    const descriptors = Object.getOwnPropertyDescriptors(className.prototype);
+    return Object.keys(descriptors).filter((key) => typeof descriptors[key].get === "function");
+}
+
 
 // from: https://stackoverflow.com/a/143889
 // Determines if the passed element is overflowing its bounds,
@@ -58,105 +61,230 @@ function throttle (callbackFn, limit=100) {
 }
 
 /* Book Constructor --------------------------------------- */
+class Book {
+    #title;
+    #author;
+    #genre;
+    #year;
+    #pages;
+    #pagesRead;
+    #favourite;
+    #id;
+    #addedOn;
+    #progress;
+    #stateId;
+    #simplifiedStateId;
 
-function Book(title, author, pages, genre='', year=NaN, pagesRead=0) {
-    this.title = title;
-    this.author = author;
-    this.genre = genre;
-    this.year = year;
-    this.pages = pages;
-    this.pagesRead = pagesRead;
-    this.favourite = false;
+    #show;
+    #matched;
 
-    currentId++;
-    this.id = currentId;
-    this.addedOn = new Date(Date.now());
+    #simplifiedStatesOfRead = ['not read yet', 'reading','read'];
+    #statesOfRead = ['not read yet', 'just started', 'halfway through', 'almost finished','read'];
 
-    // Update the state
-    this.updateState();
-
-    this.bookBoxDiv = undefined;
-}
-
-Book.prototype.stateFormatted = function () {
-    return statesOfRead[this.stateId];
-};
-
-Book.prototype.simplifiedStateFormatted = function () {
-    return simplifiedStatesOfRead[this.simplifiedStateId];
-};
-
-Book.prototype.addedOnFormatted = function () {
-    return this.addedOn.toLocaleDateString();
-};
-
-Book.prototype.info = function () {
-    return `${this.title} by ${this.author}, ${this.pages} pages, ${this.stateFormatted()} [#${this.id} - added on ${this.addedOnFormatted()}]`;
-};
-
-Book.prototype.printInfo = function () {
-    console.log(this.info())
-};
-
-Book.prototype.incrementReadPages = function (n=1) {
-    // this returns the number of incremented pages
-    // The book is read! No more pages to read
-    if (this.pagesRead == this.pages || n<=0)
-        return 0;
-
-    // n can be larger than 1: adjust it if needed
-    n = Math.min(n,this.pages-this.pagesRead);
-
-    // Increase the read pages number
-    this.pagesRead += n;
-
-    // Update the state
-    this.updateState();
-
-    return n;
-}
-
-Book.prototype.decrementReadPages = function (n=1) {
-    // this returns the number of decremented pages
-    // The book is read! No more pages to read
-    if (this.pagesRead == 0 || n<=0)
-        return 0;
-
-    // n can be larger than 1: adjust it if needed
-    n = Math.min(n,this.pagesRead);
+    constructor(title, author, pages, genre='', year=NaN, pagesRead=0) {
+        this.#title = title;
+        this.#author = author;
+        this.#genre = genre;
+        this.#year = year;
+        this.#pages = pages;
+        this.#pagesRead = pagesRead;
+        this.#favourite = false;
     
-    // Increase the read pages number
-    this.pagesRead -= n;
-
-    // Update the state
-    this.updateState();
-
-    return n;
-}
-
-Book.prototype.updateState = function () {
-    if (this.pagesRead == 0){
-        this.progress = 0;
-        this.stateId = 0;
-        this.simplifiedStateId = 0;
-    } else if (this.pagesRead == this.pages){
-        this.progress = 1;
-        this.stateId = statesOfRead.length-1;
-        this.simplifiedStateId = 2;
-    } else if (this.pagesRead > 0 && this.pagesRead < this.pages){
-        this.progress = this.pagesRead / this.pages;
-        let N = statesOfRead.length;
-        let interval = 1/(N-2);
-        this.stateId = Math.floor(this.progress/interval) + 1;
-        this.simplifiedStateId = 1;
+        currentId++;
+        this.#id = currentId;
+        this.#addedOn = new Date(Date.now());
+    
+        // Update the state
+        this.updateState();
+    
+        this.bookBoxDiv = undefined;
     }
-    this.state = statesOfRead[this.stateId];
-    this.simplifiedState = simplifiedStatesOfRead[this.simplifiedStateId];
+
+    get title(){
+        return this.#title;
+    }
+    get author(){
+        return this.#author;
+    }
+    get genre(){
+        return this.#genre;
+    }
+    get year(){
+        return this.#year;
+    }
+    get pages(){
+        return this.#pages;
+    }
+    get pagesRead(){
+        return this.#pagesRead;
+    }
+    get favourite(){
+        return this.#favourite;
+    }
+    set favourite(value){
+        this.#favourite = value;
+    }
+    get id(){
+        return this.#id;
+    }
+    get progress(){
+        return this.#progress;
+    }
+
+    get state() {
+        return this.#statesOfRead[this.#stateId];
+    }
+    
+    get simplifiedState() {
+        return this.#simplifiedStatesOfRead[this.#simplifiedStateId];
+    }
+
+    get simplifiedStateId() {
+        return this.#simplifiedStateId;
+    }
+    
+    get addedOn() {
+        return this.#addedOn.toLocaleDateString();
+    }
+
+    get show(){
+        return this.#show;
+    }
+    set show(value){
+        this.#show = value;
+    }
+
+    get matched(){
+        return this.#matched;
+    }
+    set matched(value){
+        this.#matched = value;
+    }
+    
+    info() {
+        return `${this.#title} by ${this.#author}, ${this.#pages} pages, ${this.state} [#${this.#id} - added on ${this.addedOn}]`;
+    }
+    
+    printInfo() {
+        console.log(this.info())
+    }
+    
+    incrementReadPages(n=1) {
+        // this returns the number of incremented pages
+        // The book is read! No more pages to read
+        if (this.#pagesRead == this.#pages || n<=0)
+            return 0;
+    
+        // n can be larger than 1: adjust it if needed
+        n = Math.min(n,this.#pages-this.#pagesRead);
+    
+        // Increase the read pages number
+        this.#pagesRead += n;
+    
+        // Update the state
+        this.updateState();
+    
+        return n;
+    }
+    
+    decrementReadPages(n=1) {
+        // this returns the number of decremented pages
+        // The book is read! No more pages to read
+        if (this.#pagesRead == 0 || n<=0)
+            return 0;
+    
+        // n can be larger than 1: adjust it if needed
+        n = Math.min(n,this.#pagesRead);
+        
+        // Increase the read pages number
+        this.#pagesRead -= n;
+    
+        // Update the state
+        this.updateState();
+    
+        return n;
+    }
+    
+    updateState() {
+        if (this.#pagesRead == 0){
+            this.#progress = 0;
+            this.#stateId = 0;
+            this.#simplifiedStateId = 0;
+        } else if (this.#pagesRead == this.#pages){
+            this.#progress = 1;
+            this.#stateId = this.#statesOfRead.length-1;
+            this.#simplifiedStateId = 2;
+        } else if (this.#pagesRead > 0 && this.#pagesRead < this.#pages){
+            this.#progress = this.#pagesRead / this.#pages;
+            let N = this.#statesOfRead.length;
+            let interval = 1/(N-2);
+            this.#stateId = Math.floor(this.#progress/interval) + 1;
+            this.#simplifiedStateId = 1;
+        }
+    }
+    
+    setBookBoxDiv(bookBoxDiv) {
+        this.bookBoxDiv = bookBoxDiv;
+    }
+
+    filterBy(...attributes) {
+        // attributes: array of {property: 'year', values: [1999,2009]]}: see function attributeForFilter()
+        // this function ASSUMES that each property is reported only once in attributes array
+        // a "" value is ignored
+    
+        // The book to show contains all the attributes A,B,C,..: A and B and C ...
+        // Note: to get the items to hide, you would need: not(A) or not(B) or not(C) or ...
+    
+        this.#show = true;
+    
+        attributes.map(attr =>{        
+            if (!attr.property in this|| attr.values.length==0 || attr.values=="")
+                return;
+    
+            if (this.#show && !attr.values.includes(this[attr.property]))
+                this.#show = false;
+        });
+    
+        // Update the displayed order
+        this.bookBoxDiv.classList.toggle('hide',!this.#show);
+    }
+    
+    search(str,properties=['title','author']) {
+        // a "" string is ignored
+    
+        if (str==""){
+            this.#matched = true;
+            this.bookBoxDiv.classList.remove('unmatched');
+            return;
+        }
+            
+        str = str.toLowerCase().trim();
+    
+        // Search in all properties if these are not specified
+        if (properties.length==undefined || properties.length==0)
+            properties = Object.keys(this);
+        else
+            properties =properties.filter(itm => Object.keys(this).includes(itm));
+    
+        // init the show status
+        this.#matched = false;
+    
+        // Full string search (old version)
+        // properties.map(prop =>{
+        //     if (!this.#matched && this[prop].toString().toLowerCase().includes(str))
+        //         this.#matched = true;
+        // });
+        // For each word to search, at least a match must exist
+        let str_split = str.split(/\W+/);
+        this.#matched = str_split.every(str =>
+            properties.some(prop => this[prop].toString().toLowerCase().includes(str))
+        );
+    
+        // Update the displayed books
+        this.bookBoxDiv.classList.toggle('unmatched',!this.#matched);
+    }
 }
 
-Book.prototype.setBookBoxDiv = function (bookBoxDiv) {
-    this.bookBoxDiv = bookBoxDiv;
-};
 
 /* Library Constructor --------------------------------------- */
 
@@ -253,33 +381,11 @@ function attributeForFilter(property,...values){
     return {property: property, values: values};
 }
 
-Book.prototype.filterBy = function (...attributes) {
-    // attributes: array of {property: 'year', values: [1999,2009]]}: see function attributeForFilter()
-    // this function ASSUMES that each property is reported only once in attributes array
-    // a "" value is ignored
-
-    // The book to show contains all the attributes A,B,C,..: A and B and C ...
-    // Note: to get the items to hide, you would need: not(A) or not(B) or not(C) or ...
-
-    this.show = true;
-
-    attributes.map(attr =>{        
-        if (!attr.property in this|| attr.values.length==0 || attr.values=="")
-            return;
-
-        if (this.show && !attr.values.includes(this[attr.property]))
-            this.show = false;
-    });
-
-    // Update the displayed order
-    this.bookBoxDiv.classList.toggle('hide',!this.show);
-}
-
 Library.prototype.filterBy = function (...attributes) {
     // attributes: array of {property: 'year', values: [1999,2009]]}: see function attributeForFilter()
     // this function ASSUMES that each property is reported only once in attributes array
     // a "" value is ignored
-    // Similar to Book.prototype.filterBy, but applied to all the books in the library
+    // Similar to Book's filterBy, but applied to all the books in the library
     // Note: altough the code is mostly repeated, common operations are performed only once, and not for each book.
 
     if (this.books.length==0)
@@ -303,43 +409,8 @@ Library.prototype.filterBy = function (...attributes) {
     });
 }
 
-Book.prototype.search = function (str,properties=['title','author']) {
-    // a "" string is ignored
-
-    if (str==""){
-        this.matched = true;
-        this.bookBoxDiv.classList.remove('unmatched');
-        return;
-    }
-        
-    str = str.toLowerCase().trim();
-
-    // Search in all properties if these are not specified
-    if (properties.length==undefined || properties.length==0)
-        properties = Object.keys(this);
-    else
-        properties =properties.filter(itm => Object.keys(this).includes(itm));
-
-    // init the show status
-    this.matched = false;
-
-    // Full string search (old version)
-    // properties.map(prop =>{
-    //     if (!this.matched && this[prop].toString().toLowerCase().includes(str))
-    //         this.matched = true;
-    // });
-    // For each word to search, at least a match must exist
-    let str_split = str.split(/\W+/);
-    this.matched = str_split.every(str =>
-        properties.some(prop => this[prop].toString().toLowerCase().includes(str))
-    );
-
-    // Update the displayed books
-    this.bookBoxDiv.classList.toggle('unmatched',!this.matched);
-}
-
 Library.prototype.search = function (str,properties=['title','author']) {
-    // Similar to Book.prototype.search, but applied to all the books in the library
+    // Similar to Book's search, but applied to all the books in the library
     // Note: altough the code is mostly repeated, common operations are performed only once, and not for each book.
 
     // a "" string is ignored
@@ -355,12 +426,13 @@ Library.prototype.search = function (str,properties=['title','author']) {
     }
         
     str = str.toLowerCase().trim();
+    const getters = getClassGetters(Book);
 
     if (properties.length==undefined || properties.length==0)
-        propertiesproperties = Object.keys(this.books[0]);
+        properties = getters;
     else
-        properties = properties.filter(itm => Object.keys(this.books[0]).includes(itm));
-
+        properties = properties.filter(itm => getters.includes(itm));
+   
     // init the show status
     this.books.map(itm => itm.matched = false);
 
@@ -379,7 +451,7 @@ Library.prototype.search = function (str,properties=['title','author']) {
         );
     });
 
-    //console.table(this.books.filter(itm => itm.matched));
+    // console.table(this.books.filter(itm => itm.matched));
 
     // Update the displayed books
     this.books.map((itm) => {
@@ -627,7 +699,7 @@ function createNewBookBox(newBook){
 
     let bookAddedonSection_div_var = document.createElement('span');
     bookAddedonSection_div_var.classList.add('var-data','var-addedon');
-    bookAddedonSection_div_var.textContent = newBook.addedOnFormatted();
+    bookAddedonSection_div_var.textContent = newBook.addedOn;
 
     bookAddedonSection_div.appendChild(bookAddedonSection_div_var);
     bookFooterSection.appendChild(bookAddedonSection_div);
