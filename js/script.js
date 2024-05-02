@@ -60,7 +60,7 @@ function throttle (callbackFn, limit=100) {
     }
 }
 
-/* Book Constructor --------------------------------------- */
+/* Book Class --------------------------------------- */
 class Book {
     #title;
     #author;
@@ -77,6 +77,8 @@ class Book {
 
     #show;
     #matched;
+
+    #bookBoxDiv;
 
     #simplifiedStatesOfRead = ['not read yet', 'reading','read'];
     #statesOfRead = ['not read yet', 'just started', 'halfway through', 'almost finished','read'];
@@ -97,7 +99,7 @@ class Book {
         // Update the state
         this.updateState();
     
-        this.bookBoxDiv = undefined;
+        this.#bookBoxDiv = undefined;
     }
 
     get title(){
@@ -160,7 +162,14 @@ class Book {
     set matched(value){
         this.#matched = value;
     }
-    
+
+    get bookBoxDiv(){
+        return this.#bookBoxDiv;
+    }
+    set bookBoxDiv(value){
+        this.#bookBoxDiv = value;
+    }
+
     info() {
         return `${this.#title} by ${this.#author}, ${this.#pages} pages, ${this.state} [#${this.#id} - added on ${this.addedOn}]`;
     }
@@ -222,10 +231,6 @@ class Book {
             this.#simplifiedStateId = 1;
         }
     }
-    
-    setBookBoxDiv(bookBoxDiv) {
-        this.bookBoxDiv = bookBoxDiv;
-    }
 
     filterBy(...attributes) {
         // attributes: array of {property: 'year', values: [1999,2009]]}: see function attributeForFilter()
@@ -246,7 +251,7 @@ class Book {
         });
     
         // Update the displayed order
-        this.bookBoxDiv.classList.toggle('hide',!this.#show);
+        this.#bookBoxDiv.classList.toggle('hide',!this.#show);
     }
     
     search(str,properties=['title','author']) {
@@ -254,7 +259,7 @@ class Book {
     
         if (str==""){
             this.#matched = true;
-            this.bookBoxDiv.classList.remove('unmatched');
+            this.#bookBoxDiv.classList.remove('unmatched');
             return;
         }
             
@@ -281,183 +286,191 @@ class Book {
         );
     
         // Update the displayed books
-        this.bookBoxDiv.classList.toggle('unmatched',!this.#matched);
+        this.#bookBoxDiv.classList.toggle('unmatched',!this.#matched);
     }
 }
 
 
-/* Library Constructor --------------------------------------- */
+/* Library Class --------------------------------------- */
 
-function Library() {
-    this.books = [];
-}
+class Library{
+    #books = [];
 
-Library.prototype.info = function () {
-    return this.books.reduce((str, itm, idx) => {
-        return `${str} ${idx + 1}) ${itm.info()} \n`;
-    }, '');
-}
+    constructor(){}
 
-Library.prototype.printInfo = function () {
-    console.log(this.info())
-}
-
-Library.prototype.bookAlreadyInLibrary = function (book) {
-    return this.books.some(itm => (book.title == itm.title && book.author == itm.author && book.pages == itm.pages 
-                && book.genre == itm.genre && book.year == itm.year));
-}
-
-Library.prototype.addBook = function (book) {
-    // The return is true if the book is added to the library, false if it is already present
-    // If the book is already in the library, ignore the request
-    if (this.bookAlreadyInLibrary(book)) {
-        return false;
+    get books(){
+        return this.#books;
     }
 
-    // Update the library array
-    this.books.push(book);
-    return true;
-}
-
-Library.prototype.deleteBook = function (book) {
-    const index = this.books.indexOf(book);
-    if (index > -1) {
-        this.books.splice(index, 1);
+    info() {
+        return this.#books.reduce((str, itm, idx) => {
+            return `${str} ${idx + 1}) ${itm.info()} \n`;
+        }, '');
     }
-}
-
-// eg, properties to sort: title, author, genre, year, pages, pagesRead, id[addedOn], progress
-Library.prototype.sortBy = function (property, descend = false) {
-    if (this.books.length==0 || !property in this.books[0])
-        return;
-
-    let sampleItem = this.books[0][property];
-
-    if (typeof sampleItem == 'number')
-        this.books.sort((a,b) => {
-            let aNum = a[property];
-            let bNum = b[property];
-            // Fix for NaN: these are pushed at the beginning
-            // see https://stackoverflow.com/questions/17557807/how-do-you-sort-a-javascript-array-that-includes-nans
-            let aIsNum = isFinite(aNum);
-            let bIsNum = isFinite(bNum);
-            if (aIsNum){
-                if (bIsNum)
-                    return aNum - bNum; // both numeric
+    
+    printInfo() {
+        console.log(this.info())
+    }
+    
+    bookAlreadyInLibrary(book) {
+        return this.#books.some(itm => (book.title == itm.title && book.author == itm.author && book.pages == itm.pages 
+                    && book.genre == itm.genre && book.year == itm.year));
+    }
+    
+    addBook(book) {
+        // The return is true if the book is added to the library, false if it is already present
+        // If the book is already in the library, ignore the request
+        if (this.bookAlreadyInLibrary(book)) {
+            return false;
+        }
+    
+        // Update the library array
+        this.#books.push(book);
+        return true;
+    }
+    
+    deleteBook(book) {
+        const index = this.#books.indexOf(book);
+        if (index > -1) {
+            this.#books.splice(index, 1);
+        }
+    }
+    
+    // eg, properties to sort: title, author, genre, year, pages, pagesRead, id[addedOn], progress
+    sortBy(property, descend = false) {
+        if (this.#books.length==0 || !property in this.#books[0])
+            return;
+    
+        let sampleItem = this.#books[0][property];
+    
+        if (typeof sampleItem == 'number')
+            this.#books.sort((a,b) => {
+                let aNum = a[property];
+                let bNum = b[property];
+                // Fix for NaN: these are pushed at the beginning
+                // see https://stackoverflow.com/questions/17557807/how-do-you-sort-a-javascript-array-that-includes-nans
+                let aIsNum = isFinite(aNum);
+                let bIsNum = isFinite(bNum);
+                if (aIsNum){
+                    if (bIsNum)
+                        return aNum - bNum; // both numeric
+                    else
+                        return 1; // b [not numeric] < a
+                } else {
+                    if (bIsNum)
+                        return -1; // a [not numeric] < b
+                    else
+                        return 0; //  both not numeric
+                }
+            });
+        else if (typeof sampleItem == 'string') // alphabetical order
+            this.#books.sort((a,b) => {
+                let aStr = a[property].toUpperCase();
+                let bStr = b[property].toUpperCase();
+                if (aStr < bStr)
+                    return -1;
+                else if (aStr > bStr)
+                    return 1;
                 else
-                    return 1; // b [not numeric] < a
-            } else {
-                if (bIsNum)
-                    return -1; // a [not numeric] < b
-                else
-                    return 0; //  both not numeric
-            }
+                    return 0;
+            });
+        else if (sampleItem instanceof Date)
+            this.#books.sort((a,b) => a[property].getTime() - b[property].getTime());    
+    
+        if (descend)
+            this.#books.reverse();
+    
+        //console.table(this.#books);
+    
+        // Update the displayed order
+        this.#books.map((itm,idx) => itm.bookBoxDiv.style.order = idx);
+    }
+
+    filterBy(...attributes) {
+        // attributes: array of {property: 'year', values: [1999,2009]]}: see function attributeForFilter()
+        // this function ASSUMES that each property is reported only once in attributes array
+        // a "" value is ignored
+        // Similar to Book's filterBy, but applied to all the books in the library
+        // Note: altough the code is mostly repeated, common operations are performed only once, and not for each book.
+    
+        if (this.#books.length==0)
+            return;
+    
+        this.#books.map(itm => itm.show = true);
+    
+        attributes.map(attr =>{        
+            if (!attr.property in this.#books[0] || attr.values.length==0 || attr.values=="")
+                return;
+    
+            this.#books.map(itm => {
+                if (itm.show && !attr.values.includes(itm[attr.property]))
+                    itm.show = false;
+            });
         });
-    else if (typeof sampleItem == 'string') // alphabetical order
-        this.books.sort((a,b) => {
-            let aStr = a[property].toUpperCase();
-            let bStr = b[property].toUpperCase();
-            if (aStr < bStr)
-                return -1;
-            else if (aStr > bStr)
-                return 1;
-            else
-                return 0;
+    
+        // Update the displayed order
+        this.#books.map((itm) => {
+            itm.bookBoxDiv.classList.toggle('hide',!itm.show);
         });
-    else if (sampleItem instanceof Date)
-        this.books.sort((a,b) => a[property].getTime() - b[property].getTime());    
-
-    if (descend)
-        this.books.reverse();
-
-    //console.table(this.books);
-
-    // Update the displayed order
-    this.books.map((itm,idx) => itm.bookBoxDiv.style.order = idx);
+    }
+    
+    search(str,properties=['title','author']) {
+        // Similar to Book's search, but applied to all the books in the library
+        // Note: altough the code is mostly repeated, common operations are performed only once, and not for each book.
+    
+        // a "" string is ignored
+        if (this.#books.length==0)
+            return;
+    
+        if (str==""){
+            this.#books.map(itm => itm.matched = true);
+            this.#books.map((itm) => {
+                itm.bookBoxDiv.classList.remove('unmatched');
+            });
+            return;
+        }
+            
+        str = str.toLowerCase().trim();
+        const getters = getClassGetters(Book);
+    
+        if (properties.length==undefined || properties.length==0)
+            properties = getters;
+        else
+            properties = properties.filter(itm => getters.includes(itm));
+       
+        // init the show status
+        this.#books.map(itm => itm.matched = false);
+    
+        // Full string search (old version)
+        // properties.map(prop =>{        
+        //     this.#books.map(itm => {
+        //         if (!itm.matched && itm[prop].toString().toLowerCase().includes(str))
+        //             itm.matched = true;
+        //     });
+        // });
+        // For each word to search, at least a match must exist
+        let str_split = str.split(/\W+/);
+        this.#books.map(itm => {
+            itm.matched = str_split.every(str =>
+                properties.some(prop => itm[prop].toString().toLowerCase().includes(str))
+            );
+        });
+    
+        // console.table(this.#books.filter(itm => itm.matched));
+    
+        // Update the displayed books
+        this.#books.map((itm) => {
+            itm.bookBoxDiv.classList.toggle('unmatched',!itm.matched);
+        });
+    }
 }
+
 
 function attributeForFilter(property,...values){
     // use this as attributeForFilter('title','value1','value2')
     return {property: property, values: values};
 }
 
-Library.prototype.filterBy = function (...attributes) {
-    // attributes: array of {property: 'year', values: [1999,2009]]}: see function attributeForFilter()
-    // this function ASSUMES that each property is reported only once in attributes array
-    // a "" value is ignored
-    // Similar to Book's filterBy, but applied to all the books in the library
-    // Note: altough the code is mostly repeated, common operations are performed only once, and not for each book.
-
-    if (this.books.length==0)
-        return;
-
-    this.books.map(itm => itm.show = true);
-
-    attributes.map(attr =>{        
-        if (!attr.property in this.books[0] || attr.values.length==0 || attr.values=="")
-            return;
-
-        this.books.map(itm => {
-            if (itm.show && !attr.values.includes(itm[attr.property]))
-                itm.show = false;
-        });
-    });
-
-    // Update the displayed order
-    this.books.map((itm) => {
-        itm.bookBoxDiv.classList.toggle('hide',!itm.show);
-    });
-}
-
-Library.prototype.search = function (str,properties=['title','author']) {
-    // Similar to Book's search, but applied to all the books in the library
-    // Note: altough the code is mostly repeated, common operations are performed only once, and not for each book.
-
-    // a "" string is ignored
-    if (this.books.length==0)
-        return;
-
-    if (str==""){
-        this.books.map(itm => itm.matched = true);
-        this.books.map((itm) => {
-            itm.bookBoxDiv.classList.remove('unmatched');
-        });
-        return;
-    }
-        
-    str = str.toLowerCase().trim();
-    const getters = getClassGetters(Book);
-
-    if (properties.length==undefined || properties.length==0)
-        properties = getters;
-    else
-        properties = properties.filter(itm => getters.includes(itm));
-   
-    // init the show status
-    this.books.map(itm => itm.matched = false);
-
-    // Full string search (old version)
-    // properties.map(prop =>{        
-    //     this.books.map(itm => {
-    //         if (!itm.matched && itm[prop].toString().toLowerCase().includes(str))
-    //             itm.matched = true;
-    //     });
-    // });
-    // For each word to search, at least a match must exist
-    let str_split = str.split(/\W+/);
-    this.books.map(itm => {
-        itm.matched = str_split.every(str =>
-            properties.some(prop => itm[prop].toString().toLowerCase().includes(str))
-        );
-    });
-
-    // console.table(this.books.filter(itm => itm.matched));
-
-    // Update the displayed books
-    this.books.map((itm) => {
-        itm.bookBoxDiv.classList.toggle('unmatched',!itm.matched);
-    });
-}
 
 /* Book Box (DOM)*/
 /* HTML CODE TO GENERATE:
@@ -943,7 +956,7 @@ function addNewBookToLibrary(bookDataArray){
 
     /* Add it to the DOM */
     let bookBox = createNewBookBox(book);
-    book.setBookBoxDiv(bookBox);
+    book.bookBoxDiv = bookBox;
     updateBookInfo(bookBox,book);
     booksContainer.appendChild(bookBox);
 
