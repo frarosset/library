@@ -233,7 +233,7 @@ class Book {
     }
 
     filterBy(...attributes) {
-        // attributes: array of {property: 'year', values: [1999,2009]]}: see function attributeForFilter()
+        // attributes: array of {property: 'year', values: [1999,2009]]}: see DisplaySettings's method attributeForFilter()
         // this function ASSUMES that each property is reported only once in attributes array
         // a "" value is ignored
     
@@ -387,7 +387,7 @@ class Library{
     }
 
     filterBy(...attributes) {
-        // attributes: array of {property: 'year', values: [1999,2009]]}: see function attributeForFilter()
+        // attributes: array of {property: 'year', values: [1999,2009]]}: see DisplaySettings's method attributeForFilter()
         // this function ASSUMES that each property is reported only once in attributes array
         // a "" value is ignored
         // Similar to Book's filterBy, but applied to all the books in the library
@@ -463,12 +463,6 @@ class Library{
             itm.bookBoxDiv.classList.toggle('unmatched',!itm.matched);
         });
     }
-}
-
-
-function attributeForFilter(property,...values){
-    // use this as attributeForFilter('title','value1','value2')
-    return {property: property, values: values};
 }
 
 
@@ -1354,149 +1348,197 @@ function windowResize_callback(){
     adaptBooksTitleSizeInLibrary();
 }
 
-/* Display settings */
-// The sort / search / filter have to be updated when:
-//  - the method of sorting/searching/filtering changes [FOR THE ENTIRE LIBRARY]
-//  - a new book is added [search / filter: ONLY FOR THE NEW BOOK, sort: FOR THE ENTIRE LIBRARY]
-//  - the read pages or the favourite status changes [search / filter: ONLY FOR THE NEW BOOK, sort: FOR THE ENTIRE LIBRARY]
-
-function displaySettingOrderby_callback(e){
-    displaySettings.orderBy = e.target.value;
-    myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend);
-}
-
-function displaySettingOrderByDescend_callback(e){
-    displaySettings.orderByDescend = e.target.classList.toggle('descend');
-    myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend);
-}
-
-function displaySettingSearch_callback(e){
-    displaySettings.searchStr = e.target.value;
-    myLibrary.search(displaySettings.searchStr, displaySettings.searchInProperties);
-}
-
-function displaySettingFilterFavourites_callback(e){
-    displaySettings.getLogicValueFromStr('favourite', e.target.value);     
-    /* Update filter argument: trasform the properties of displaySettings.filter to an array (discarding the keys) */
-    displaySettings.updateFilterArgInDisplaySettings();
-    myLibrary.filterBy(...displaySettings.filterArg);
-}
-
-function displaySettingFilterState_callback(e){
-    displaySettings.getIntegerValueFromStr('simplifiedStateId', e.target.value);     
-    /* Update filter argument: trasform the properties of displaySettings.filter to an array (discarding the keys) */
-    displaySettings.updateFilterArgInDisplaySettings();
-    myLibrary.filterBy(...displaySettings.filterArg);
-}
-
-function displaySettingViewInfo_callback(e){
-    e.target.classList.toggle('view-text');
-    booksContainer.classList.toggle('view-text');
-}
-
-function displaySettingScroll_callback(e){
-    let booksContainerOffsetTop = booksContainer.offsetTop;
-    let scrollPos = window.scrollY;
-
-    /* Ignore if the scroll is not registered*/
-    if (displaySettings.prevScrollPos == scrollPos)
-        return;
-
-    if (scrollPos > booksContainerOffsetTop){
-        /* Set the top length after which the displaySettingsSticky sticks.*/
-        /* --settings-top is a CSS variable defined in styles.css */
-        displaySettings.displaySettingsSticky.style.top = 'var(--settings-top)';
-
-        /* Set the .pinned class when the position is actually sticked: here any positive scroll position indicates this */
-        /* A shadow is added to the pinned div */
-        displaySettings.displaySettingsSticky.classList.toggle("pinned", scrollPos > 0);
-
-        /* Set the .hide class when scrolling down (except the scroll at the beginning) */
-        displaySettings.displaySettingsSticky.classList.toggle("hide",displaySettings.prevScrollPos <= scrollPos && scrollPos > booksContainerOffsetTop);
-    } else {
-        /* This actually makes the displaySettingsSticky static: scroll down normally initially */
-        displaySettings.displaySettingsSticky.style.top = '-100%';
-        displaySettings.displaySettingsSticky.classList.remove("pinned");
-        displaySettings.displaySettingsSticky.classList.remove("hide");
-    }
-
-    /* Update the previous scroll posiiton */
-    displaySettings.prevScrollPos = scrollPos;
-}
 
 /* Display settings object */
 
-function DisplaySettings(){
-    this.displaySettingsSticky = document.querySelector(".display-settings");
-    this.prevScrollPos = window.scrollY;
+class DisplaySettings{
+    #displaySettingsSticky;
+    #prevScrollPos;
 
-    window.addEventListener("scroll",throttle(displaySettingScroll_callback,timeoutScrollMs));
+    #displaySettingFilterFavouritesEmpty;
+    #displaySettingFilterStateEmpty;
+    #displaySettingSearch;
 
-    let displaySettingOrderby = document.querySelector("#display-setting-orderby");
-    this.orderBy = displaySettingOrderby.value;
+    #filter;
+    #filterArg;
+    #orderBy;
+    #orderByDescend;
+    #searchStr;
+    #searchInProperties;
 
-    let displaySettingOrderByDescend = document.querySelector("#display-setting-orderby-descend-btn");
-    this.orderByDescend = displaySettingOrderByDescend.classList.contains('descend');
+    constructor(){
+        this.#displaySettingsSticky = document.querySelector(".display-settings");
+        this.#prevScrollPos = window.scrollY;
+    
+        let displaySettingOrderby = document.querySelector("#display-setting-orderby");
+        this.#orderBy = displaySettingOrderby.value;
+    
+        let displaySettingOrderByDescend = document.querySelector("#display-setting-orderby-descend-btn");
+        this.#orderByDescend = displaySettingOrderByDescend.classList.contains('descend');
+    
+        this.#displaySettingSearch = document.querySelector("#display-setting-search");
+        this.#searchStr = this.#displaySettingSearch.value;
+    
+        this.#searchInProperties = ['title','author'];
+    
+        this.#filter = {};
+    
+        let displaySettingFilterFavourites = document.querySelector("#display-setting-filter-favourites");
+        this.#displaySettingFilterFavouritesEmpty = displaySettingFilterFavourites.querySelector('#display-setting-filter-favourites-empty');
+        let filterFavouritesValueStr = getCheckedRadioValueAmongDescendants(displaySettingFilterFavourites);
+        this.#getLogicValueFromStr('favourite', filterFavouritesValueStr);
+    
+        let displaySettingFilterState = document.querySelector("#display-setting-filter-state");
+        this.#displaySettingFilterStateEmpty = displaySettingFilterState.querySelector('#display-setting-filter-state-empty');
+        let filterStateValueStr = getCheckedRadioValueAmongDescendants(displaySettingFilterState);
+        this.#getIntegerValueFromStr('simplifiedStateId', filterStateValueStr);    
+    
+        this.#updateFilterArgInDisplaySettings(); /* this sets .#filterArg*/
+        
+        let displaySettingViewInfo = document.querySelector("#display-setting-view-info-btn");
 
-    this.displaySettingSearch = document.querySelector("#display-setting-search");
-    this.searchStr = this.displaySettingSearch.value;
+        /* Display settings event listeners */   
+        window.addEventListener("scroll",throttle(this.#displaySettingScroll_callback.bind(this),timeoutScrollMs));
+        displaySettingOrderby.addEventListener('change', this.#displaySettingOrderby_callback.bind(this));
+        displaySettingOrderByDescend.addEventListener('click', this.#displaySettingOrderByDescend_callback.bind(this));
+        this.#displaySettingSearch.addEventListener('input', this.#displaySettingSearch_callback.bind(this));
+        displaySettingFilterFavourites.addEventListener('change', this.#displaySettingFilterFavourites_callback.bind(this));
+        displaySettingFilterState.addEventListener('change', this.#displaySettingFilterState_callback.bind(this));
+        displaySettingViewInfo.addEventListener('click', this.#displaySettingViewInfo_callback.bind(this));
+    }
 
-    this.searchInProperties = ['title','author'];
+    get filterArg(){
+        return this.#filterArg;
+    }
+    get orderBy(){
+        return this.#orderBy;
+    }
+    get orderByDescend(){
+        return this.#orderByDescend;
+    }
+    get searchStr(){
+        return this.#searchStr;
+    }
+    get searchInProperties(){
+        return this.#searchInProperties;
+    }
 
-    this.filter = {};
+    resetFilters(){
+        // Reset search
+        this.#displaySettingSearch.value = '';
+        this.#searchStr = this.#displaySettingSearch.value;
+        myLibrary.search(this.#searchStr, this.#searchInProperties);
+    
+        //Reset filter favourites and state
+        this.#displaySettingFilterFavouritesEmpty.checked = true;
+        this.#displaySettingFilterStateEmpty.checked = true;
+        this.#getLogicValueFromStr('favourite', this.#displaySettingFilterFavouritesEmpty.value);     
+        this.#getIntegerValueFromStr('simplifiedStateId', this.#displaySettingFilterStateEmpty.value);  
+    
+        /* Update filter argument: trasform the properties of this.#filter to an array (discarding the keys) */
+        this.#updateFilterArgInDisplaySettings();
+        myLibrary.filterBy(...this.#filterArg);
+    }
+    
+    #attributeForFilter(property,...values){
+        // use this as attributeForFilter('title','value1','value2')
+        return {property: property, values: values};
+    }
 
-    let displaySettingFilterFavourites = document.querySelector("#display-setting-filter-favourites");
-    this.displaySettingFilterFavouritesEmpty = displaySettingFilterFavourites.querySelector('#display-setting-filter-favourites-empty');
-    let filterFavouritesValueStr = getCheckedRadioValueAmongDescendants(displaySettingFilterFavourites);
-    this.getLogicValueFromStr('favourite', filterFavouritesValueStr);
+    #getLogicValueFromStr(property,str){
+        if (str == "")
+            this.#filter[property] =  this.#attributeForFilter(property, ); // empty values
+        else
+            this.#filter[property] =  this.#attributeForFilter(property, str == true);  
+    }
+    
+    #getIntegerValueFromStr(property,str){
+        if (str == "")
+            this.#filter[property] =  this.#attributeForFilter(property, ); // empty values
+        else
+            this.#filter[property] =  this.#attributeForFilter(property, parseInt(str));  
+    }
 
-    let displaySettingFilterState = document.querySelector("#display-setting-filter-state");
-    this.displaySettingFilterStateEmpty = displaySettingFilterState.querySelector('#display-setting-filter-state-empty');
-    let filterStateValueStr = getCheckedRadioValueAmongDescendants(displaySettingFilterState);
-    this.getIntegerValueFromStr('simplifiedStateId', filterStateValueStr);    
+    #updateFilterArgInDisplaySettings(){
+        /* Update filter argument: trasform the properties of this.#filter to an array (discarding the keys) */
+        this.#filterArg = Object.entries(this.#filter).map(itm => itm[1]);
+    }
 
-    this.updateFilterArgInDisplaySettings(); /* this sets .filterArg*/
+    /* Display settings callbacks */
+    // The sort / search / filter have to be updated when:
+    //  - the method of sorting/searching/filtering changes [FOR THE ENTIRE LIBRARY]
+    //  - a new book is added [search / filter: ONLY FOR THE NEW BOOK, sort: FOR THE ENTIRE LIBRARY]
+    //  - the read pages or the favourite status changes [search / filter: ONLY FOR THE NEW BOOK, sort: FOR THE ENTIRE LIBRARY]
 
+    #displaySettingOrderby_callback(e){
+        this.#orderBy = e.target.value;
+        myLibrary.sortBy(this.#orderBy, this.#orderByDescend);
+    }
+
+    #displaySettingOrderByDescend_callback(e){
+        this.#orderByDescend = e.target.classList.toggle('descend');
+        myLibrary.sortBy(this.#orderBy, this.#orderByDescend);
+    }
+
+    #displaySettingSearch_callback(e){
+        this.#searchStr = e.target.value;
+        myLibrary.search(this.#searchStr, this.#searchInProperties);
+    }
+
+    #displaySettingFilterFavourites_callback(e){
+        this.#getLogicValueFromStr('favourite', e.target.value);     
+        /* Update filter argument: trasform the properties of this.#filter to an array (discarding the keys) */
+        this.#updateFilterArgInDisplaySettings();
+        myLibrary.filterBy(...this.#filterArg);
+    }
+
+    #displaySettingFilterState_callback(e){
+        this.#getIntegerValueFromStr('simplifiedStateId', e.target.value);     
+        /* Update filter argument: trasform the properties of this.#filter to an array (discarding the keys) */
+        this.#updateFilterArgInDisplaySettings();
+        myLibrary.filterBy(...this.#filterArg);
+    }
+
+    #displaySettingViewInfo_callback(e){
+        e.target.classList.toggle('view-text');
+        booksContainer.classList.toggle('view-text');
+    }
+
+    #displaySettingScroll_callback(e){
+        let booksContainerOffsetTop = booksContainer.offsetTop;
+        let scrollPos = window.scrollY;
+
+        /* Ignore if the scroll is not registered*/
+        if (this.#prevScrollPos == scrollPos)
+            return;
+
+        if (scrollPos > booksContainerOffsetTop){
+            /* Set the top length after which the displaySettingsSticky sticks.*/
+            /* --settings-top is a CSS variable defined in styles.css */
+            this.#displaySettingsSticky.style.top = 'var(--settings-top)';
+
+            /* Set the .pinned class when the position is actually sticked: here any positive scroll position indicates this */
+            /* A shadow is added to the pinned div */
+            this.#displaySettingsSticky.classList.toggle("pinned", scrollPos > 0);
+
+            /* Set the .hide class when scrolling down (except the scroll at the beginning) */
+            this.#displaySettingsSticky.classList.toggle("hide",this.#prevScrollPos <= scrollPos && scrollPos > booksContainerOffsetTop);
+        } else {
+            /* This actually makes the displaySettingsSticky static: scroll down normally initially */
+            this.#displaySettingsSticky.style.top = '-100%';
+            this.#displaySettingsSticky.classList.remove("pinned");
+            this.#displaySettingsSticky.classList.remove("hide");
+        }
+
+        /* Update the previous scroll posiiton */
+        this.#prevScrollPos = scrollPos;
+    }
+     
 }
 
-DisplaySettings.prototype.resetFilters = function(property,str){
-    // Reset search
-    this.displaySettingSearch.value = '';
-    displaySettings.searchStr = this.displaySettingSearch.value;
-    myLibrary.search(displaySettings.searchStr, displaySettings.searchInProperties);
-
-    //Reset filter favourites and state
-    this.displaySettingFilterFavouritesEmpty.checked = true;
-    this.displaySettingFilterStateEmpty.checked = true;
-    displaySettings.getLogicValueFromStr('favourite', this.displaySettingFilterFavouritesEmpty.value);     
-    displaySettings.getIntegerValueFromStr('simplifiedStateId', this.displaySettingFilterStateEmpty.value);  
-
-    /* Update filter argument: trasform the properties of displaySettings.filter to an array (discarding the keys) */
-    displaySettings.updateFilterArgInDisplaySettings();
-    myLibrary.filterBy(...displaySettings.filterArg);
-};
-
-DisplaySettings.prototype.getLogicValueFromStr = function(property,str){
-    if (str == "")
-        this.filter[property] =  attributeForFilter(property, ); // empty values
-    else
-        this.filter[property] =  attributeForFilter(property, str == true);  
-};
-
-DisplaySettings.prototype.getIntegerValueFromStr = function(property,str){
-    if (str == "")
-        this.filter[property] =  attributeForFilter(property, ); // empty values
-    else
-        this.filter[property] =  attributeForFilter(property, parseInt(str));  
-};
-
-DisplaySettings.prototype.updateFilterArgInDisplaySettings = function(){
-    /* Update filter argument: trasform the properties of displaySettings.filter to an array (discarding the keys) */
-    this.filterArg = Object.entries(this.filter).map(itm => itm[1]);
-};
 
 function getCheckedRadioValueAmongDescendants(ascendentElement){
-    return ascendentElement.querySelector("input[type=radio]:checked").value;
+    return ascendentElement.querySelector('input[type=radio]:checked').value;
 }
 
 
@@ -1568,25 +1610,6 @@ function initInterface(){
 
     /* Re-fit book titles sizes when resizing the window */
     window.addEventListener('resize',throttle(windowResize_callback,timeoutResizeMs));
-
-    /* Display settings */
-    let displaySettingOrderby = document.querySelector("#display-setting-orderby");
-    displaySettingOrderby.addEventListener('change', displaySettingOrderby_callback);
-    
-    let displaySettingOrderByDescend = document.querySelector("#display-setting-orderby-descend-btn");
-    displaySettingOrderByDescend.addEventListener('click', displaySettingOrderByDescend_callback);
-    
-    let displaySettingSearch = document.querySelector("#display-setting-search");
-    displaySettingSearch.addEventListener('input', displaySettingSearch_callback);
-
-    let displaySettingFilterFavourites = document.querySelector("#display-setting-filter-favourites");
-    displaySettingFilterFavourites.addEventListener('change', displaySettingFilterFavourites_callback);
-
-    let displaySettingFilterState = document.querySelector("#display-setting-filter-state");
-    displaySettingFilterState.addEventListener('change', displaySettingFilterState_callback);
-
-    let displaySettingViewInfo = document.querySelector("#display-setting-view-info-btn");
-    displaySettingViewInfo.addEventListener('click', displaySettingViewInfo_callback);
   
     myLibrary.sortBy(displaySettings.orderBy, displaySettings.orderByDescend);
 }
